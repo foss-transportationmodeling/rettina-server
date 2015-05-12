@@ -23,7 +23,7 @@ def get_stops():
     if len(trip_id) == 0:
         stops = models.Stop.query.all()
     else:
-        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id)
+        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
         if not trip is None:
             stops = trip.stops
         else:
@@ -100,17 +100,14 @@ def load_gtfs():
     shutil.rmtree('tmp/GTFS')
     return jsonify({ '200' : 'Data Loaded' })
 def delete_all_records():
-    a = models.Agency.query.all()
-    cd = models.CalendarDate.query.all()
-    c = models.Calendar.query.all()
-    r = models.Route.query.all()
-    st = models.StopTime.query.all()
-    s = models.Stop.query.all()
-    t = models.Trip.query.all()
-    sh = models.Shape.query.all()
-    for array in [a, cd, c, r, st, s, t, sh]:
-        for item in array:
-            db.session.delete(item)
+    a = models.Agency.query.delete()
+    cd = models.CalendarDate.query.delete()
+    c = models.Calendar.query.delete()
+    r = models.Route.query.delete()
+    st = models.StopTime.query.delete()
+    s = models.Stop.query.delete()
+    t = models.Trip.query.delete()
+    sh = models.Shape.query.delete()
     db.session.commit()
     
 @app.errorhandler(400)
