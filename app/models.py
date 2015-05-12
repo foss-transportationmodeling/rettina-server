@@ -38,6 +38,7 @@ class Stop(db.Model):
     stop_timezone = db.Column(db.String(2))
     wheelchair_boarding = db.Column(db.Integer)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref = db.backref('stops', lazy = 'dynamic'))
     def serialize(self):
         return {
             'stop_id' : self.stop_id,
@@ -51,8 +52,7 @@ class Stop(db.Model):
             'location_type' : self.location_type,
             'parent_station' : self.parent_station,
             'stop_timezone' : self.stop_timezone,
-            'wheelchair_boarding' : self.wheelchair_boarding,
-            'trip_id' : self.trip.trip_id
+            'wheelchair_boarding' : self.wheelchair_boarding
         }
     
 class Route(db.Model):
@@ -93,8 +93,6 @@ class Trip(db.Model):
     shape_id = db.Column(db.Integer)
     wheelchair_accessible = db.Column(db.Integer)
     bikes_allowed = db.Column(db.Integer)
-    stop_times = db.relationship('StopTime', backref = 'trip', lazy = 'dynamic')
-    stops = db.relationship('Stop', backref = 'trip', lazy = 'dynamic')
     def serialize(self):
         return {
             'route_id' : self.route_id,
@@ -112,6 +110,7 @@ class Trip(db.Model):
 class StopTime(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref = db.backref('stop_times', lazy = 'dynamic'))
     arrival_time = db.Column(db.String(16))
     departure_time = db.Column(db.String(16))
     stop_id = db.Column(db.String(32))
@@ -125,7 +124,6 @@ class StopTime(db.Model):
     stop_lon = db.Column(db.Float)
     def serialize(self):
         return {
-            'trip_id' : self.trip.trip_id,
             'arrival_time' : self.arrival_time,
             'departure_time' : self.departure_time,
             'stop_id' : self.stop_id,

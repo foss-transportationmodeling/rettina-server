@@ -120,10 +120,10 @@ def load_shapes():
 
 def load_all():
     load_agency()
-    load_stops()
+#    load_stops()
     load_routes()
     load_trips()
-    load_stop_times()
+#    load_stop_times()
     load_calendar()
     load_calendar_dates()
     load_shapes()
