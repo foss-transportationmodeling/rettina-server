@@ -2,6 +2,26 @@ from app import db, models
 
 GTFS_PATH = "tmp/GTFS/UC_GTFS/"
 
+def object_for_name(name):
+    if name == "Agency":
+        return models.Agency()
+    elif name == "Stop":
+        return models.Stop()
+    elif name == "Route":
+        return models.Route()
+    elif name == "Trip":
+        return models.Trip()
+    elif name == "StopTime":
+        return models.StopTime()
+    elif name == "Calendar":
+        return models.Calendar()
+    elif name == "CalendarDate":
+        return models.CalendarDate()
+    elif name == "Shape":
+        return models.Shape()
+    else:
+        return None
+        
 def load_objects(file, name):
     objects = []
     f = open(file, 'r')
@@ -22,43 +42,15 @@ def load_objects(file, name):
         objects.append(obj)
     return objects
 
-def object_for_name(name):
-    if name == "Agency":
-        return models.Agency()
-    elif name == "Stop":
-        return models.Stop()
-    elif name == "Route":
-        return models.Route()
-    elif name == "Trip":
-        return models.Trip()
-    elif name == "StopTime":
-        return models.StopTime()
-    elif name == "Calendar":
-        return models.Calendar()
-    elif name == "CalendarDate":
-        return models.CalendarDate()
-    elif name == "Shape":
-        return models.Shape()
-    else:
-        return None
-
-def commit_objects(objects):
-    for obj in objects:
-        db.session.add(obj)
-    db.session.commit()
-
-def add_coordinates(stop_times):
-    for stop_time in stop_times:
-        stop = models.Stop.query.filter(models.Stop.stop_id == stop_time.stop_id).first()
-        if not stop is None:
-            setattr(stop_time, 'stop_lat', stop.stop_lat)
-            setattr(stop_time, 'stop_lon', stop.stop_lon)
-
 def set_trip_for_stop_time(stop_time, trip_id):
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
     if not trip is None:
         stop_time.trip = trip
 
+def commit_objects(objects):
+    for obj in objects:
+        db.session.add(obj)
+    db.session.commit()
 
 def load_agency():
     print "loading agencies"
@@ -68,6 +60,7 @@ def load_agency():
     except:
         print "Error in loading agency.txt"
         db.session.rollback()
+        
 def load_stops():
     try:
         stops = load_objects(GTFS_PATH + "stops.txt", "Stop")
@@ -75,6 +68,7 @@ def load_stops():
     except:
         print "Error in loading stops.txt"
         db.session.rollback()
+        
 def load_routes():
     try:
         routes = load_objects(GTFS_PATH + "routes.txt", "Route")
@@ -82,6 +76,7 @@ def load_routes():
     except:
         print "Error in loading routes.txt"
         db.session.rollback()
+        
 def load_trips():
     try:
         trips = load_objects(GTFS_PATH + "trips.txt", "Trip")
@@ -89,14 +84,29 @@ def load_trips():
     except:
         print "Error in loading trips.txt"
         db.session.rollback()
+        
+def add_coordinates_and_relationships(stop_times):
+    for stop_time in stop_times:
+        stop = models.Stop.query.filter(models.Stop.stop_id == stop_time.stop_id).first()
+        trip = stop_time.trip
+        if not stop is None:
+            setattr(stop_time, 'stop_lat', stop.stop_lat)
+            setattr(stop_time, 'stop_lon', stop.stop_lon)
+            if not trip is None:
+                trip.stops.append(stop)
+                db.session.add(trip)
+                db.session.add(stop)
+                # these will be committed when stop_times are committed
+        
 def load_stop_times():
     try:
         stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
-        add_coordinates(stop_times)
+        add_coordinates_and_relationships(stop_times)
         commit_objects(stop_times)
     except:
         print "Error in loading stop_times.txt"
         db.session.rollback()
+        
 def load_calendar():
     try:
         calendar = load_objects(GTFS_PATH + "calendar.txt", "Calendar")
@@ -104,6 +114,7 @@ def load_calendar():
     except:
         print "Error in loading calendar.txt"
         db.session.rollback()
+        
 def load_calendar_dates():
     try:
         calendar_dates = load_objects(GTFS_PATH + "calendar_dates.txt", "CalendarDate")
@@ -111,6 +122,7 @@ def load_calendar_dates():
     except:
         print "Error in loading calendar_dates.txt"
         db.session.rollback()
+        
 def load_shapes():
     try:
         shapes = load_objects(GTFS_PATH + "shapes.txt", "Shape")
@@ -121,10 +133,14 @@ def load_shapes():
 
 def load_all():
     load_agency()
+    # the order is important:
+    # first, trips must be loaded
     load_trips()
     load_stops()
-    load_routes()
+    # stops must be loaded before stop_times 
+    # so we can add lat-lon from stops to stop_times
     load_stop_times()
+    load_routes()
     load_calendar()
     load_calendar_dates()
     load_shapes()
