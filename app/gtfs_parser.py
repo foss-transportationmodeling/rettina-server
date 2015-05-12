@@ -11,11 +11,14 @@ def load_objects(file, name):
         obj = object_for_name(name)
         values = line.strip().split(',')
         for i, key in enumerate(keys):
-            if hasattr(obj, key):
-                try:
-                    setattr(obj, key, values[i])
-                except IndexError:
-                    print "A value is missing from " + file
+            if name == "StopTime" and key == "trip_id":
+                set_trip_for_stop_time(obj, values[i])
+            else:
+                if hasattr(obj, key):
+                    try:
+                        setattr(obj, key, values[i])
+                    except IndexError:
+                        print "A value is missing from " + file
         objects.append(obj)
     return objects
 
@@ -50,13 +53,12 @@ def add_coordinates(stop_times):
         if not stop is None:
             setattr(stop_time, 'stop_lat', stop.stop_lat)
             setattr(stop_time, 'stop_lon', stop.stop_lon)
-def add_trip_ids(stop_times):
-    for stop_time in stop_times:
-        stop = models.Stop.query.filter(models.Stop.stop_id == stop_time.stop_id).first()
-        if not stop is None:
-            setattr(stop, 'trip_id', stop_time.trip_id)
-            db.session.add(stop)
-        # the edited stops will be committed when the stop_times are committed 
+
+def set_trip_for_stop_time(stop_time, trip_id):
+    trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
+    if not trip is None:
+        stop_time.trip = trip
+
 
 def load_agency():
     print "loading agencies"
@@ -91,7 +93,6 @@ def load_stop_times():
     try:
         stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
         add_coordinates(stop_times)
-        add_trip_ids(stop_times)
         commit_objects(stop_times)
     except:
         print "Error in loading stop_times.txt"
@@ -120,9 +121,9 @@ def load_shapes():
 
 def load_all():
     load_agency()
+    load_trips()
 #    load_stops()
     load_routes()
-    load_trips()
 #    load_stop_times()
     load_calendar()
     load_calendar_dates()
