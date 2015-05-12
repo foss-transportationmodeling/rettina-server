@@ -37,6 +37,7 @@ class Stop(db.Model):
     parent_station = db.Column(db.String(32))
     stop_timezone = db.Column(db.String(2))
     wheelchair_boarding = db.Column(db.Integer)
+    trip_id = db.Column(db.String(32))
     def serialize(self):
         return {
             'stop_id' : self.stop_id,
@@ -50,7 +51,8 @@ class Stop(db.Model):
             'location_type' : self.location_type,
             'parent_station' : self.parent_station,
             'stop_timezone' : self.stop_timezone,
-            'wheelchair_boarding' : self.wheelchair_boarding
+            'wheelchair_boarding' : self.wheelchair_boarding,
+            'trip_id' : self.trip_id
         }
     
 class Route(db.Model):

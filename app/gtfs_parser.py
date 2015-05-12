@@ -50,6 +50,13 @@ def add_coordinates(stop_times):
         if not stop is None:
             setattr(stop_time, 'stop_lat', stop.stop_lat)
             setattr(stop_time, 'stop_lon', stop.stop_lon)
+def add_trip_ids(stop_times):
+    for stop_time in stop_times:
+        stop = models.Stop.query.filter(models.Stop.stop_id == stop_time.stop_id).first()
+        if not stop is None:
+            setattr(stop, 'trip_id', stop_time.trip_id)
+            db.session.add(stop)
+        # the edited stops will be committed when the stop_times are committed 
 
 def load_agency():
     print "loading agencies"
@@ -84,6 +91,7 @@ def load_stop_times():
     try:
         stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
         add_coordinates(stop_times)
+        add_trip_ids(stop_times)
         commit_objects(stop_times)
     except:
         print "Error in loading stop_times.txt"
