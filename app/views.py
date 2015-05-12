@@ -18,7 +18,16 @@ def get_agency():
 
 @app.route('/stops', methods=['GET'])
 def get_stops():
-    stops = models.Stop.query.all()
+    stops = None
+    trip_id = request.args.get('trip_id', '')
+    if len(trip_id) == 0:
+        stops = models.Stop.query.all()
+    else:
+        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id)
+        if not trip is None:
+            stops = trip.stops
+        else:
+            return jsonify({ '404' : 'No Stops Found' })
     return jsonify({ 'stops' : [s.serialize() for s in stops] })
 
 @app.route('/routes', methods=['GET'])
@@ -89,7 +98,7 @@ def load_gtfs():
     delete_all_records()
     gtfs_parser.load_all()
     shutil.rmtree('tmp/GTFS')
-    return jsonify({})
+    return jsonify({ '200' : 'Data Loaded' })
 def delete_all_records():
     a = models.Agency.query.all()
     cd = models.CalendarDate.query.all()
