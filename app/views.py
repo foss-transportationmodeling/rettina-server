@@ -40,14 +40,12 @@ def get_routes():
             else:
                 # filter by latitude and longitude only
                 stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2)
-            trip_ids = Set()
+            trips = Set()
             for stop_time in stop_times:
-                trip_ids.add(stop_time.trip_id)
-            all_trips = models.Trip.query.all()
+                trips.add(stop_time.trip)
             route_ids = Set()
-            for trip in all_trips:
-                if trip.trip_id in trip_ids:
-                    route_ids.add(trip.route_id)
+            for trip in trips:
+                route_ids.add(trip.route_id)
             filtered_routes = []
             for route in routes:
                 if route.route_id in route_ids:
