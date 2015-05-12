@@ -134,7 +134,8 @@ class StopTime(db.Model):
             'shape_dist_traveled' : self.shape_dist_traveled,
             'timepoint' : self.timepoint,
             'stop_lat' : self.stop_lat,
-            'stop_lon' : self.stop_lon
+            'stop_lon' : self.stop_lon,
+	    'trip_id' : self.trip.trip_id
         }
     
 class Calendar(db.Model):
