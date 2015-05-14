@@ -56,7 +56,6 @@ class Stop(db.Model):
 class Route(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     route_id = db.Column(db.String(32), unique = True)
-    trip_id = db.Column(db.String(32), unique = True)
     route_short_name = db.Column(db.String(256))
     route_long_name = db.Column(db.String(512))
     route_desc = db.Column(db.Text)
@@ -71,7 +70,7 @@ class Route(db.Model):
             'route_id' : self.route_id,
             'agency_id' : self.agency.agency_id,
             'agency_name' : self.agency.agency_name,
-            'trip_id' : self.trip_id,
+            'trip_ids' : [trip.trip_id for trip in self.trips],
             'route_short_name' : self.route_short_name,
             'route_long_name' : self.route_long_name,
             'route_desc' : self.route_desc,
