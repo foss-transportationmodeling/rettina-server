@@ -88,7 +88,6 @@ stops = db.Table('stops',
     
 class Trip(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    route_id = db.Column(db.String(32))
     service_id = db.Column(db.String(32))
     trip_id = db.Column(db.String(32), unique = True)
     trip_headsign = db.Column(db.String(32))
@@ -100,9 +99,11 @@ class Trip(db.Model):
     bikes_allowed = db.Column(db.Integer)
     stops = db.relationship('Stop', secondary = stops, 
         backref = db.backref('trips', lazy = 'dynamic'))
+    route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
+    route = db.relationship('Route', backref = db.backref('trips', lazy = 'dynamic'))
     def serialize(self):
         return {
-            'route_id' : self.route_id,
+            'route_id' : self.route.route_id,
             'service_id' : self.service_id,
             'trip_id' : self.trip_id,
             'trip_headsign' : self.trip_headsign,

@@ -31,10 +31,13 @@ def load_objects(file, name):
         obj = object_for_name(name)
         values = line.strip().split(',')
         for i, key in enumerate(keys):
+            # handle special cases for setting relationships
             if name == "StopTime" and key == "trip_id":
                 set_trip_for_stop_time(obj, values[i])
             elif name == "Route" and key == "agency_id":
                 set_agency_for_route(obj, values[i])
+            elif name == "Trip" and key == "route_id":
+                set_route_for_trip(obj, values[i])
             else:
                 if hasattr(obj, key):
                     try:
@@ -53,6 +56,11 @@ def set_agency_for_route(route, agency_id):
     agency = models.Agency.query.filter(models.Agency.agency_id == agency_id).first()
     if not agency is None:
         route.agency = agency
+
+def set_route_for_trip(trip, route_id):
+    route = models.Route.query.filter(models.Route.route_id == route_id).first()
+    if not route is None:
+        trip.route = route
 
 def commit_objects(objects):
     for obj in objects:
@@ -139,16 +147,16 @@ def load_shapes():
         db.session.rollback()
 
 def load_all():
-    load_agency()
-    # the order is important:
-    # first, trips must be loaded
-    load_trips()
-    load_stops()
-    # stops must be loaded before stop_times 
-    # so we can add lat-lon from stops to stop_times
-    load_stop_times()
+    # the order is important (necessary for relationships):
     # agencies must be loaded before routes
+    load_agency()
+    # routes must be loaded before trips
     load_routes()
+    # trips must be loaded before stop_times
+    load_trips()
+    # stops must be loaded before stop_times 
+    load_stops()
+    load_stop_times()
     load_calendar()
     load_calendar_dates()
     load_shapes()
