@@ -64,6 +64,7 @@ class Route(db.Model):
     route_url = db.Column(db.String(256))
     route_color = db.Column(db.String(6), default = "FFFFFF")
     route_text_color = db.Column(db.String(6), default = "000000")
+    agency_id = db.Column(db.Integer, db.ForeignKey('agency.id'))
     agency = db.relationship('Agency', backref = db.backref('routes', lazy = 'dynamic'))
     def serialize(self):
         return {
