@@ -33,6 +33,8 @@ def load_objects(file, name):
         for i, key in enumerate(keys):
             if name == "StopTime" and key == "trip_id":
                 set_trip_for_stop_time(obj, values[i])
+            elif name == "Route" and key == "agency_id":
+                set_agency_for_route(obj, values[i])
             else:
                 if hasattr(obj, key):
                     try:
@@ -46,6 +48,11 @@ def set_trip_for_stop_time(stop_time, trip_id):
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
     if not trip is None:
         stop_time.trip = trip
+        
+def set_agency_for_route(route, agency_id):
+    agency = models.Agency.query.filter(models.Agency.agency_id == agency_id).first()
+    if not agency is None:
+        route.agency = agency
 
 def commit_objects(objects):
     for obj in objects:
@@ -140,6 +147,7 @@ def load_all():
     # stops must be loaded before stop_times 
     # so we can add lat-lon from stops to stop_times
     load_stop_times()
+    # agencies must be loaded before routes
     load_routes()
     load_calendar()
     load_calendar_dates()

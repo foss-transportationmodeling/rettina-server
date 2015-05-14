@@ -56,7 +56,6 @@ class Stop(db.Model):
 class Route(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     route_id = db.Column(db.String(32), unique = True)
-    agency_id = db.Column(db.String(64))
     trip_id = db.Column(db.String(32), unique = True)
     route_short_name = db.Column(db.String(256))
     route_long_name = db.Column(db.String(512))
@@ -65,10 +64,12 @@ class Route(db.Model):
     route_url = db.Column(db.String(256))
     route_color = db.Column(db.String(6), default = "FFFFFF")
     route_text_color = db.Column(db.String(6), default = "000000")
+    agency = db.relationship('Agency', backref = db.backref('routes', lazy = 'dynamic'))
     def serialize(self):
         return {
             'route_id' : self.route_id,
-            'agency_id' : self.agency_id,
+            'agency_id' : self.agency.agency_id,
+            'agency_name' : self.agency.agency_name,
             'trip_id' : self.trip_id,
             'route_short_name' : self.route_short_name,
             'route_long_name' : self.route_long_name,
@@ -145,7 +146,7 @@ class StopTime(db.Model):
     
 class Calendar(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    service_id = db.Column(db.String(32), unique = True)
+    service_id = db.Column(db.String(32))
     monday = db.Column(db.Integer)
     tuesday = db.Column(db.Integer)
     wednesday = db.Column(db.Integer)
@@ -183,7 +184,7 @@ class CalendarDate(db.Model):
 
 class Shape(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    shape_id = db.Column(db.String(32))
+    shape_id = db.Column(db.String(64))
     shape_pt_lat = db.Column(db.Float)
     shape_pt_lon = db.Column(db.Float)
     shape_pt_sequence = db.Column(db.Integer)
