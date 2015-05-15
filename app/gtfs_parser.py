@@ -84,6 +84,7 @@ def load_agency():
         db.session.rollback()
         
 def load_stops():
+    print "loading stops"
     try:
         stops = load_objects(GTFS_PATH + "stops.txt", "Stop")
         commit_objects(stops)
@@ -92,6 +93,7 @@ def load_stops():
         db.session.rollback()
         
 def load_routes():
+    print "loading routes"
     try:
         routes = load_objects(GTFS_PATH + "routes.txt", "Route")
         commit_objects(routes)
@@ -100,6 +102,7 @@ def load_routes():
         db.session.rollback()
         
 def load_trips():
+    print "loading trips"
     try:
         trips = load_objects(GTFS_PATH + "trips.txt", "Trip")
         commit_objects(trips)
@@ -121,6 +124,7 @@ def add_coordinates_and_relationships(stop_times):
                 # these will be committed when stop_times are committed
         
 def load_stop_times():
+    print "loading stop_times"
     try:
         stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
         add_coordinates_and_relationships(stop_times)
@@ -130,6 +134,7 @@ def load_stop_times():
         db.session.rollback()
         
 def load_calendar():
+    print "loading calendar"
     try:
         calendar = load_objects(GTFS_PATH + "calendar.txt", "Calendar")
         commit_objects(calendar)
@@ -138,6 +143,7 @@ def load_calendar():
         db.session.rollback()
         
 def load_calendar_dates():
+    print "loading calendar dates"
     try:
         calendar_dates = load_objects(GTFS_PATH + "calendar_dates.txt", "CalendarDate")
         commit_objects(calendar_dates)
@@ -146,6 +152,7 @@ def load_calendar_dates():
         db.session.rollback()
         
 def load_shapes():
+    print "loading shapes"
     try:
         shapes = load_objects(GTFS_PATH + "shapes.txt", "Shape")
         commit_objects(shapes)

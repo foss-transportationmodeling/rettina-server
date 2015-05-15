@@ -132,10 +132,12 @@ def load_shapes():
         for stop in json_obj:
             shape_id = stop["RouteID"]
             if str(shape_id) == "13": # Late Night (which has RouteID = 13) is not supported
+                print "skipping Late Night"
                 continue
             for map_point in stop["MapPoints"]:
                 latitude = map_point["Latitude"]
                 longitude = map_point["Longitude"]
+                print "adding shape: latitude = " + str(latitude) + ", longitude = " + str(longitude)
                 shape = ShapeItem(shape_id, latitude, longitude)
                 shapes.append(shape)
         last_shape_id = -1
