@@ -66,11 +66,19 @@ class Route(db.Model):
     agency_id = db.Column(db.Integer, db.ForeignKey('agency.id'))
     agency = db.relationship('Agency', backref = db.backref('routes', lazy = 'dynamic'))
     def serialize(self):
+        a_name = None
+        a_id = None
+        if not self.agency is None:
+            a_name = self.agency.agency_name
+            a_id = self.agency.agency_id
+        t_ids = None
+        if not self.trips is None:
+            t_ids = [trip.trip_id for trip in self.trips]
         return {
             'route_id' : self.route_id,
-            'agency_id' : self.agency.agency_id,
-            'agency_name' : self.agency.agency_name,
-            'trip_ids' : [trip.trip_id for trip in self.trips],
+            'agency_id' : a_id,
+            'agency_name' : a_name,
+            'trip_ids' : t_ids,
             'route_short_name' : self.route_short_name,
             'route_long_name' : self.route_long_name,
             'route_desc' : self.route_desc,
@@ -101,8 +109,11 @@ class Trip(db.Model):
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
     route = db.relationship('Route', backref = db.backref('trips', lazy = 'dynamic'))
     def serialize(self):
+        r_id = None
+        if not self.route is None:
+            r_id = self.route.route_id
         return {
-            'route_id' : self.route.route_id,
+            'route_id' : r_id,
             'service_id' : self.service_id,
             'trip_id' : self.trip_id,
             'trip_headsign' : self.trip_headsign,
@@ -192,8 +203,11 @@ class Shape(db.Model):
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
     route = db.relationship('Route', backref = db.backref('shapes', lazy = 'dynamic'))
     def serialize(self):
+        r_id = None
+        if not self.route is None:
+            r_id = self.route.route_id
         return {
-            'shape_id' : self.route.route_id,
+            'shape_id' : r_id,
             'shape_pt_lat' : self.shape_pt_lat,
             'shape_pt_lon' : self.shape_pt_lon,
             'shape_pt_sequence' : self.shape_pt_sequence,

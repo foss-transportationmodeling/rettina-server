@@ -92,8 +92,30 @@ class ShapeItem:
     lon = None
     order = None
     dist_traveled = None
+    # the original route IDs from the UConn JSON feed were not preserved
+    # so this method translates the original IDs to the IDs used in UC_GTFS
+    # the Late Night route is not supported, apparently
+    def translated_id(self, original):
+        if original == 3:
+            return 4
+        elif original == 5:
+            return 1
+        elif original == 11:
+            return 8
+        elif original == 19:
+            return 2
+        elif original == 21:
+            return 3
+        elif original == 22:
+            return 5
+        elif original == 24:
+            return 7
+        elif original == 25:
+            return 6
+        else:
+            return 'route ID not supported'
     def __init__(self, shape_id, lat, lon):
-        self.shape_id = shape_id
+        self.shape_id = self.translated_id(shape_id)
         self.lat = lat
         self.lon = lon
     def to_str(self):
@@ -109,6 +131,8 @@ def load_shapes():
         shapes = []
         for stop in json_obj:
             shape_id = stop["RouteID"]
+            if str(shape_id) == "13": # Late Night (which has RouteID = 13) is not supported
+                continue
             for map_point in stop["MapPoints"]:
                 latitude = map_point["Latitude"]
                 longitude = map_point["Longitude"]
