@@ -92,9 +92,8 @@ def get_shapes():
         shapes = models.Shape.query.all()
     else:
         trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
-        if not trip is None:
-            if not trip.route is None:
-                shapes = trip.route.shapes
+        if not trip is None and not trip.route is None:
+            shapes = trip.route.shapes
         else:
             return jsonify({ '404' : 'No Shapes Found' })
     return jsonify({ 'shapes' : [s.serialize() for s in shapes] })    

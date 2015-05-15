@@ -157,7 +157,7 @@ def load_all():
     # the order is important (necessary for relationships):
     # agencies must be loaded before routes
     load_agency()
-    # routes must be loaded before trips
+    # routes must be loaded before trips and before shapes
     load_routes()
     # trips must be loaded before stop_times
     load_trips()
