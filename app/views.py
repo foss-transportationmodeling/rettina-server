@@ -86,7 +86,17 @@ def get_calendar_dates():
     
 @app.route('/shapes', methods=['GET'])
 def get_shapes():
-    shapes = models.Shape.query.all()
+    shapes = None
+    trip_id = request.args.get('trip_id', '')
+    if len(trip_id) == 0:
+        shapes = models.Shape.query.all()
+    else:
+        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
+        if not trip is None:
+            if not trip.route is None:
+                shapes = trip.route.shapes
+        else:
+            return jsonify({ '404' : 'No Shapes Found' })
     return jsonify({ 'shapes' : [s.serialize() for s in shapes] })    
 
 @app.route('/load_gtfs', methods=['GET'])

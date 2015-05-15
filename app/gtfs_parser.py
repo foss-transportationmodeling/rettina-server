@@ -38,6 +38,8 @@ def load_objects(file, name):
                 set_agency_for_route(obj, values[i])
             elif name == "Trip" and key == "route_id":
                 set_route_for_trip(obj, values[i])
+            elif name == "Shape" and key == "shape_id":
+                set_route_for_shape(obj, values[i])
             else:
                 if hasattr(obj, key):
                     try:
@@ -61,6 +63,11 @@ def set_route_for_trip(trip, route_id):
     route = models.Route.query.filter(models.Route.route_id == route_id).first()
     if not route is None:
         trip.route = route
+        
+def set_route_for_shape(shape, route_id):
+    route = models.Route.query.filter(models.Route.route_id == route_id).first()
+    if not route is None:
+        shape.route = route
 
 def commit_objects(objects):
     for obj in objects:

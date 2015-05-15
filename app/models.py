@@ -185,14 +185,15 @@ class CalendarDate(db.Model):
 
 class Shape(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    shape_id = db.Column(db.String(64))
     shape_pt_lat = db.Column(db.Float)
     shape_pt_lon = db.Column(db.Float)
     shape_pt_sequence = db.Column(db.Integer)
     shape_dist_traveled = db.Column(db.Float)
+    route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
+    route = db.relationship('Route', backref = db.backref('shapes', lazy = 'dynamic'))
     def serialize(self):
         return {
-            'shape_id' : self.shape_id,
+            'shape_id' : self.route.route_id,
             'shape_pt_lat' : self.shape_pt_lat,
             'shape_pt_lon' : self.shape_pt_lon,
             'shape_pt_sequence' : self.shape_pt_sequence,
