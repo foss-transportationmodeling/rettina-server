@@ -32,7 +32,7 @@ def get_stops():
 
 @app.route('/routes', methods=['GET'])
 def get_routes():
-    routes = models.Route.query.all()
+    routes = None
     if len(request.args.keys()) > 0:
         # filter routes by the provided URL parameters
         lat1 = request.args.get('lat1', 999)
@@ -41,7 +41,10 @@ def get_routes():
         lon2 = request.args.get('lon2', 999)
         time = request.args.get('time', '')
         invalid = lat1 == 999 or lon1 == 999 or lat2 == 999 or lon2 == 999
-        if not invalid:
+        if invalid:
+            # the parameters provided cannot be used to filter, so return error
+            return jsonify({ '404' : 'Bad URL Parameters'}), 404
+        else:
             stop_times = []
             if len(time) > 0:
                 # filter by latitude, longitude, and time
@@ -52,18 +55,13 @@ def get_routes():
             trips = Set()
             for stop_time in stop_times:
                 trips.add(stop_time.trip)
-            route_ids = Set()
+            filtered_routes = Set()
             for trip in trips:
-                route_ids.add(trip.route_id)
-            filtered_routes = []
-            for route in routes:
-                if route.route_id in route_ids:
-                    filtered_routes.append(route)
+                filtered_routes.add(trip.route)
             routes = filtered_routes
-        else:
-            # the parameters provided cannot be used to filter, so return error
-            return jsonify({ '404' : 'Bad URL Parameters'}), 404
-    # otherwise, no URL parameters are provided, so return all routes
+    else:
+        # otherwise, no URL parameters are provided, so return all routes
+        routes = models.Route.query.all()
     return jsonify({ 'routes' : [r.serialize() for r in routes] })
 
 @app.route('/trips', methods=['GET'])
