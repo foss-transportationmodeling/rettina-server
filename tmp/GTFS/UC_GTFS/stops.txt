@@ -1,0 +1,73 @@
+stop_id,stop_code,stop_name,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding
+1,,Central Warehouse Inbound,41.8114056,-72.2619083,,,0,,,1
+2,,Upper F-Lot Inbound,41.8107722,-72.2631056,,,0,,,1
+3,,Lower F-Lot Inbound,41.8088639,-72.2638111,,,0,,,1
+4,,L Lot,41.8076778,-72.2615833,,,0,,,1
+5,,Foundation,41.8081861,-72.2575889,,,0,,,1
+6,,Field House,41.8064056,-72.2547944,,,0,,,1
+7,,Uconn Co-op,41.8047111,-72.25295,,,0,,,1
+8,,Alumni,41.8039222,-72.2510889,,,0,,,1
+9,,Arjona Eastbound,41.8055194,-72.2485639,,,0,,,1
+10,,South Campus,41.8055278,-72.2466667,,,0,,,1
+11,,Mansfield Town Hall,41.8015389,-72.2415889,,,0,,,1
+12,,Mansfield Apartments and 275,41.7989222,-72.24415,,,0,,,1
+13,,Mansfield Apartments,41.7989556,-72.2417278,,,0,,,1
+14,,Mansfield Town Hall Northbound,41.8016611,-72.2413611,,,0,,,1
+15,,Buckley,41.8054361,-72.2444944,,,0,,,1
+16,,Arjona Westbound,41.8055889,-72.2486944,,,0,,,1
+17,,West Campus,41.8040639,-72.2510944,,,0,,,1
+18,,Connecticut Commons,41.8048111,-72.252875,,,0,,,1
+19,,Student Union,41.8061667,-72.2543389,,,0,,,1
+20,,North Garage,41.80835,-72.257475,,,0,,,1
+21,,North Hillside Road,41.811875,-72.2608417,,,0,,,1
+22,,C-Lot,41.8135,-72.2690611,,,0,,,1
+23,,Celeron Path,41.8132111,-72.2662417,,,0,,,1
+24,,Busby Suites,41.8146389,-72.2618944,,,0,,,1
+25,,Charter Oak Apartments,41.8169361,-72.2637306,,,0,,,1
+26,,Shippee Northbound,41.8063694,-72.2453,,,0,,,1
+27,,East Campus Northbound,41.8096667,-72.2478861,,,0,,,1
+28,,Young Building Outbound,41.8114861,-72.247075,,,0,,,1
+29,,Horse Barn Hill Arena,41.8155306,-72.2427222,,,0,,,1
+30,,A-Lot,41.8135611,-72.2438472,,,0,,,1
+31,,Young Building Inbound,41.81155,-72.2472889,,,0,,,1
+32,,Chemistry Building Westbound,41.8114167,-72.2510917,,,0,,,1
+33,,North Campus,41.8106,-72.2572278,,,0,,,1
+34,,Engineering Eastbound,41.8083556,-72.2549306,,,0,,,1
+35,,CLAS,41.8106028,-72.2516694,,,0,,,1
+36,,East Campus Southbound,41.8093667,-72.2479194,,,0,,,1
+37,,Shippee Southbound,41.8066972,-72.2457472,,,0,,,1
+38,,Health Services,41.8100278,-72.2532556,,,0,,,1
+39,,Engineering Westbound,41.8084444,-72.2550028,,,0,,,1
+41,,W-Lot,41.8170667,-72.2567694,,,0,,,1
+42,,Towers,41.8135194,-72.2541861,,,0,,,1
+43,,I-Lot,41.7990667,-72.2558667,,,0,,,1
+44,,D-Lot Eastbound,41.80256667,-72.25651111,,,0,,,1
+45,,Hilltop Apartments,41.8011333,-72.2583222,,,0,,,1
+46,,Hilltop Community Center,41.8028056,-72.2599889,,,0,,,1
+47,,Hilltop Dorms Southbound,41.8057028,-72.2597778,,,0,,,1
+48,,Math Science Building,41.81010833,-72.25780556,,,0,,,1
+49,,Chemistry Building Eastbound,41.811325,-72.25173333,,,0,,,1
+50,,Post Office,41.8019,-72.24051944,,,0,,,1
+51,,Transportation Center/Garage,41.80427833,-72.24182333,,,0,,,1
+52,,F Lot/ North Eagleville,41.8084,-72.26369444,,,0,,,1
+53,,Northwood Apartments Outbound,41.80410278,-72.27113611,,,0,,,1
+54,,Hunting Lodge/ North Eagleville Outbound,41.80752222,-72.2653,,,0,,,1
+55,,Celeron Square Apartments,41.81259444,-72.27353889,,,0,,,1
+56,,Holinko Estates Outbound,41.81459444,-72.27536111,,,0,,,1
+57,,Hunting Lodge Apartments Outbound,41.81629167,-72.27944444,,,0,,,1
+58,,Clubhouse Apartments,41.82148056,-72.27903056,,,0,,,1
+59,,Brown Building,41.80868056,-72.29849722,,,0,,,1
+60,,Lebanon Cottage,41.80690556,-72.29672222,,,0,,,1
+61,,Puppet Lab,41.80747778,-72.29338056,,,0,,,1
+62,,Central Stores Surplus,41.80779167,-72.29537778,,,0,,,1
+63,,Fuel Cell Center,41.80853889,-72.296525,,,0,,,1
+64,,Walter's Cottage,41.80939722,-72.29154444,,,0,,,1
+65,,Tolland Cottage,41.80975833,-72.28966667,,,0,,,1
+66,,Silver Falls,41.81350278,-72.28555556,,,0,,,1
+67,,Hunting Lodge Apartments Inbound,41.81629167,-72.27944444,,,0,,,1
+68,,Carriage House Apartments,41.81259444,-72.27353889,,,0,,,1
+69,,Northwood Apartments Inbound,41.80410278,-72.27113611,,,0,,,1
+70,,Hunting Lodge/ North Eagleville Inbound,41.80752222,-72.2653,,,0,,,1
+71,,Hilltop Dorms Northbound,41.80571944,-72.25961389,,,0,,,1
+72,,D-Lot Westbound,41.802625,-72.25674444,,,0,,,1
+73,,Holinko Estates Inbound,41.81464722,-72.27574167,,,0,,,1

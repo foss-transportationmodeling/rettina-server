@@ -14,7 +14,7 @@ class TestCase(unittest.TestCase):
         db.create_all()
 
     def tearDown(self):
-        shutil.rmtree('tmp/GTFS')
+#        shutil.rmtree('tmp/GTFS')
         db.session.remove()
         db.drop_all()
         

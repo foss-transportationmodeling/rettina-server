@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone
+UConn,UConn Transportation Service,http://transpo.uconn.edu/#home,America/New_York

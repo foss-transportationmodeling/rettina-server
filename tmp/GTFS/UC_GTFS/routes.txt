@@ -1,0 +1,9 @@
+route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+1,UConn,,BLUE LINE,,3,,,#0066FF
+2,UConn,,ORANGE LINE,,3,,,#FF9900
+3,UConn,,YELLOW LINE,,3,,,#FFFF00
+4,UConn,,RED LINE,,3,,,#FF3300
+5,UConn,,GREEN LINE,,3,,,#33CC33
+6,UConn,,PURPLE LINE,,3,,,#9900FF
+7,UConn,,SILVER LINE,,3,,,#CCCCCC
+8,UConn,,WEEKEND SHUTTLE,,3,,,#996633
