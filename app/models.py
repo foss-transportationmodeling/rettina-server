@@ -42,7 +42,7 @@ class Stop(db.Model):
         if not self.stop_times is None:
             ats = [st.arrival_time for st in self.stop_times]
         dts = None
-        if not self.departure_times is None:
+        if not self.stop_times is None:
             dts = [st.departure_time for st in self.stop_times]
         return {
             'stop_id' : self.stop_id,
