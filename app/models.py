@@ -38,6 +38,12 @@ class Stop(db.Model):
     stop_timezone = db.Column(db.String(2))
     wheelchair_boarding = db.Column(db.Integer)
     def serialize(self):
+        ats = None
+        if not self.stop_times is None:
+            ats = [st.arrival_time for st in self.stop_times]
+        dts = None
+        if not self.departure_times is None:
+            dts = [st.departure_time for st in self.stop_times]
         return {
             'stop_id' : self.stop_id,
             'stop_code' : self.stop_code,
@@ -50,7 +56,9 @@ class Stop(db.Model):
             'location_type' : self.location_type,
             'parent_station' : self.parent_station,
             'stop_timezone' : self.stop_timezone,
-            'wheelchair_boarding' : self.wheelchair_boarding
+            'wheelchair_boarding' : self.wheelchair_boarding,
+            'arrival_times' : ats,
+            'departure_times' : dts
         }
     
 class Route(db.Model):
@@ -145,6 +153,9 @@ class StopTime(db.Model):
         s_id = None
         if not self.stop is None:
             s_id = self.stop.stop_id
+        t_id = None
+        if not self.trip is None:
+            t_id = self.trip.trip_id
         return {
             'arrival_time' : self.arrival_time,
             'departure_time' : self.departure_time,
@@ -157,7 +168,7 @@ class StopTime(db.Model):
             'timepoint' : self.timepoint,
             'stop_lat' : self.stop_lat,
             'stop_lon' : self.stop_lon,
-            'trip_id' : self.trip.trip_id
+            'trip_id' : t_id
         }
     
 class Calendar(db.Model):
