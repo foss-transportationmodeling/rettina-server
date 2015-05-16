@@ -14,7 +14,6 @@ class TestCase(unittest.TestCase):
         db.create_all()
 
     def tearDown(self):
-#        shutil.rmtree('tmp/GTFS')
         db.session.remove()
         db.drop_all()
         
@@ -62,6 +61,10 @@ class TestCase(unittest.TestCase):
         gtfs_parser.load_shapes()
         shapes = models.Shape.query.all()
         assert len(shapes) > 0
+
+    def test_remove_tmp(self):
+        shutil.rmtree('tmp/GTFS')
+        assert len([name for name in os.listdir('tmp/') if os.path.isfile(name)]) == 0
 
 if __name__ == '__main__':
     unittest.main()
