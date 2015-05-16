@@ -34,6 +34,8 @@ def load_objects(file, name):
             # handle special cases for setting relationships
             if name == "StopTime" and key == "trip_id":
                 set_trip_for_stop_time(obj, values[i])
+            elif name == "StopTime" and key == "stop_id":
+                set_stop_for_stop_time(obj, values[i])
             elif name == "Route" and key == "agency_id":
                 set_agency_for_route(obj, values[i])
             elif name == "Trip" and key == "route_id":
@@ -49,11 +51,25 @@ def load_objects(file, name):
         objects.append(obj)
     return objects
 
+# this will always happen before setting the Stop ID for a stop_time
+# due to the ordering of trip_id and stop_id in GTFS
 def set_trip_for_stop_time(stop_time, trip_id):
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
     if not trip is None:
         stop_time.trip = trip
         
+def set_stop_for_stop_time(stop_time, stop_id):
+    stop = models.Stop.query.filter(models.Stop.stop_id == stop_id).first()
+    if not stop is None:
+        stop_time.stop = stop
+        stop_time.stop_lat = stop.stop_lat
+        stop_time.stop_lon = stop.stop_lon
+        # a stop_time's trip must be set before its stop,
+        # in order to link trips to stops
+        trip = stop_time.trip
+        if not trip is None:
+            trip.stops.append(stop)
+            
 def set_agency_for_route(route, agency_id):
     agency = models.Agency.query.filter(models.Agency.agency_id == agency_id).first()
     if not agency is None:
@@ -110,24 +126,10 @@ def load_trips():
         print "Error in loading trips.txt"
         db.session.rollback()
         
-def add_coordinates_and_relationships(stop_times):
-    for stop_time in stop_times:
-        stop = models.Stop.query.filter(models.Stop.stop_id == stop_time.stop_id).first()
-        trip = stop_time.trip
-        if not stop is None:
-            setattr(stop_time, 'stop_lat', stop.stop_lat)
-            setattr(stop_time, 'stop_lon', stop.stop_lon)
-            if not trip is None:
-                trip.stops.append(stop)
-                db.session.add(trip)
-                db.session.add(stop)
-                # these will be committed when stop_times are committed
-        
 def load_stop_times():
     print "loading stop_times"
     try:
         stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
-        add_coordinates_and_relationships(stop_times)
         commit_objects(stop_times)
     except:
         print "Error in loading stop_times.txt"

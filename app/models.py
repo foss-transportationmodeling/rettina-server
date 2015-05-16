@@ -131,7 +131,8 @@ class StopTime(db.Model):
     trip = db.relationship('Trip', backref = db.backref('stop_times', lazy = 'dynamic'))
     arrival_time = db.Column(db.String(16))
     departure_time = db.Column(db.String(16))
-    stop_id = db.Column(db.String(32))
+    stop_id = db.Column(db.Integer, db.ForeignKey('stop.id'))
+    stop = db.relationship('Stop', backref = db.backref('stop_times', lazy = 'dynamic'))
     stop_sequence = db.Column(db.Integer)
     stop_headsign = db.Column(db.String(64))
     pickup_type = db.Column(db.Integer)
@@ -141,10 +142,13 @@ class StopTime(db.Model):
     stop_lat = db.Column(db.Float)
     stop_lon = db.Column(db.Float)
     def serialize(self):
+        s_id = None
+        if not self.stop is None:
+            s_id = self.stop.stop_id
         return {
             'arrival_time' : self.arrival_time,
             'departure_time' : self.departure_time,
-            'stop_id' : self.stop_id,
+            'stop_id' : s_id,
             'stop_sequence' : self.stop_sequence,
             'stop_headsign' : self.stop_headsign,
             'pickup_type' : self.pickup_type,
