@@ -1,9 +1,9 @@
 #!flask/bin/python
-import os
+import os, zipfile, os, shutil
 import unittest
 
 from config import basedir
-from app import app, db
+from app import app, db, models, gtfs_parser
 
 class TestCase(unittest.TestCase):
     def setUp(self):
@@ -14,49 +14,52 @@ class TestCase(unittest.TestCase):
         db.create_all()
 
     def tearDown(self):
+        shutil.rmtree('tmp/GTFS')
         db.session.remove()
         db.drop_all()
         
     def test_gtfs_data_exists(self):
         assert os.path.isfile('UC_GTFS.zip')
+        zfile = zipfile.ZipFile('UC_GTFS.zip')
+        zfile.extractall('tmp/GTFS/')
 
     def test_load_agency(self):
-        load_agency()
+        gtfs_parser.load_agency()
         agencies = models.Agency.query.all()
         assert len(agencies) > 0
         
     def test_load_routes(self):
-        load_routes()
+        gtfs_parser.load_routes()
         routes = models.Route.query.all()
         assert len(routes) > 0
 
     def test_load_trips(self):
-        load_trips()
+        gtfs_parser.load_trips()
         trips = models.Trip.query.all()
         assert len(trips) > 0
         
     def test_load_stops(self):
-        load_stops()
+        gtfs_parser.load_stops()
         stops = models.Stop.query.all()
         assert len(stops) > 0
         
     def test_load_stop_times(self):
-        load_stop_times()
+        gtfs_parser.load_stop_times()
         stop_times = models.StopTime.query.all()
         assert len(stop_times) > 0
         
     def test_load_calendar(self):
-        load_calendar()
+        gtfs_parser.load_calendar()
         calendar = models.Calendar.query.all()
         assert len(calendar) > 0
         
     def test_load_calendar_dates(self):
-        load_calendar_dates()
+        gtfs_parser.load_calendar_dates()
         calendar_dates = models.CalendarDate.query.all()
         assert len(calendar_dates) > 0
         
     def test_load_shapes(self):
-        load_shapes()
+        gtfs_parser.load_shapes()
         shapes = models.Shape.query.all()
         assert len(shapes) > 0
 
