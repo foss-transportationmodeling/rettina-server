@@ -62,8 +62,12 @@ def load_objects(file, name):
 def to_datetime_from_utc(time_tuple):
     return datetime.fromtimestamp(timegm(time_tuple), tz = utc)
 def set_arrival_for_stop_time(stop_time, arrival_time_string):
+    if arrival_time_string == "24:00:00" or arrival_time_string == "24:01:00":
+        arrival_time_string = "23:59:59"
     stop_time.arrival_time = to_datetime_from_utc(strptime(arrival_time_string, "%H:%M:%S"))
 def set_departure_for_stop_time(stop_time, departure_time_string):
+    if departure_time_string == "24:00:00" or departure_time_string == "24:01:00":
+        departure_time_string = "23:59:59"
     stop_time.departure_time = to_datetime_from_utc(strptime(departure_time_string, "%H:%M:%S"))
 
 # this will always happen before setting the Stop ID for a stop_time
