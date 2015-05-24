@@ -1,4 +1,8 @@
 from app import db, models
+from time import strptime
+from datetime import datetime
+from pytz import utc
+from calendar import timegm
 
 GTFS_PATH = "tmp/GTFS/UC_GTFS/"
 
@@ -31,9 +35,13 @@ def load_objects(file, name):
         obj = object_for_name(name)
         values = line.strip().split(',')
         for i, key in enumerate(keys):
-            # handle special cases for setting relationships
+            # handle special cases for setting relationships (and DateTime)
             if name == "StopTime" and key == "trip_id":
                 set_trip_for_stop_time(obj, values[i])
+            elif name == "StopTime" and key == "arrival_time":
+                set_arrival_for_stop_time(obj, values[i])
+            elif name == "StopTime" and key == "departure_time":
+                set_departure_for_stop_time(obj, values[i])
             elif name == "StopTime" and key == "stop_id":
                 set_stop_for_stop_time(obj, values[i])
             elif name == "Route" and key == "agency_id":
@@ -50,6 +58,13 @@ def load_objects(file, name):
                         print "A value is missing from " + file
         objects.append(obj)
     return objects
+
+def to_datetime_from_utc(time_tuple):
+    return datetime.fromtimestamp(timegm(time_tuple), tz = utc)
+def set_arrival_for_stop_time(stop_time, arrival_time_string):
+    stop_time.arrival_time = to_datetime_from_utc(strptime(arrival_time_string, "%H:%M:%S"))
+def set_departure_for_stop_time(stop_time, departure_time_string):
+    stop_time.departure_time = to_datetime_from_utc(strptime(departure_time_string, "%H:%M:%S"))
 
 # this will always happen before setting the Stop ID for a stop_time
 # due to the ordering of trip_id and stop_id in GTFS
