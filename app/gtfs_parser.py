@@ -34,7 +34,8 @@ def load_objects(file, name):
     for line in f:
         obj = object_for_name(name)
         values = line.strip().split(',')
-        continue if len(values) == 0
+        if len(values) == 0:
+            continue
         for i, key in enumerate(keys):
             try:
                 value = values[i].strip()
