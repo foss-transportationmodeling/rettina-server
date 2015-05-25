@@ -34,28 +34,30 @@ def load_objects(file, name):
     for line in f:
         obj = object_for_name(name)
         values = line.strip().split(',')
+        continue if len(values) == 0
         for i, key in enumerate(keys):
-            # handle special cases for setting relationships (and DateTime)
-            if name == "StopTime" and key == "trip_id":
-                set_trip_for_stop_time(obj, values[i])
-            elif name == "StopTime" and key == "arrival_time":
-                set_arrival_for_stop_time(obj, values[i])
-            elif name == "StopTime" and key == "departure_time":
-                set_departure_for_stop_time(obj, values[i])
-            elif name == "StopTime" and key == "stop_id":
-                set_stop_for_stop_time(obj, values[i])
-            elif name == "Route" and key == "agency_id":
-                set_agency_for_route(obj, values[i])
-            elif name == "Trip" and key == "route_id":
-                set_route_for_trip(obj, values[i])
-            elif name == "Shape" and key == "shape_id":
-                set_route_for_shape(obj, values[i])
-            else:
-                if hasattr(obj, key):
-                    try:
-                        setattr(obj, key, values[i])
-                    except IndexError:
-                        print "A value is missing from " + file
+            try:
+                value = values[i].strip()
+                # handle special cases for setting relationships (and DateTime)
+                if name == "StopTime" and key == "trip_id":
+                    set_trip_for_stop_time(obj, value)
+                elif name == "StopTime" and key == "arrival_time":
+                    set_arrival_for_stop_time(obj, value)
+                elif name == "StopTime" and key == "departure_time":
+                    set_departure_for_stop_time(obj, value)
+                elif name == "StopTime" and key == "stop_id":
+                    set_stop_for_stop_time(obj, value)
+                elif name == "Route" and key == "agency_id":
+                    set_agency_for_route(obj, value)
+                elif name == "Trip" and key == "route_id":
+                    set_route_for_trip(obj, value)
+                elif name == "Shape" and key == "shape_id":
+                    set_route_for_shape(obj, value)
+                else:
+                    if hasattr(obj, key):
+                            setattr(obj, key, value)
+            except IndexError:
+                print "A value is missing from " + file
         objects.append(obj)
     return objects
 
