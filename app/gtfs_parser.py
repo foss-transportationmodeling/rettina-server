@@ -4,7 +4,7 @@ from datetime import datetime
 from pytz import utc
 from calendar import timegm
 
-GTFS_PATH = "tmp/GTFS/UC_GTFS/"
+GTFS_PATH = "tmp/GTFS/"
 
 def object_for_name(name):
     if name == "Agency":
