@@ -1,4 +1,5 @@
 from app import db
+from datetime import datetime
 
 # add fields such as required, default value, positive integer
 
@@ -157,8 +158,8 @@ class StopTime(db.Model):
         if not self.trip is None:
             t_id = self.trip.trip_id
         return {
-            'arrival_time' : self.arrival_time,
-            'departure_time' : self.departure_time,
+            'arrival_time' : self.arrival_time.strftime("%H:%M:%S"),
+            'departure_time' : self.departure_time.strftime("%H:%M:%S"),
             'stop_id' : s_id,
             'stop_sequence' : self.stop_sequence,
             'stop_headsign' : self.stop_headsign,
