@@ -63,15 +63,15 @@ def load_objects(file, name):
     return objects
 
 def datetime_from_string(string):
-    hr = string.split(":")[0]
-    if hr == "24":
+    hr = int(string.split(":")[0])
+    if hr >= 24:
         l = list(string)
         l[0] = "0"
-        l[1] = "0"
+        l[1] = str(hr % 24)
         string = "".join(l)
     def to_datetime_from_utc(time_tuple):
         timestamp = timegm(time_tuple)
-        if hr == "24":
+        if hr >= 24:
             timestamp  = timestamp + 24*60*60
         return datetime.fromtimestamp(timegm(time_tuple), tz = utc)    
     return to_datetime_from_utc(strptime(string, "%H:%M:%S"))
@@ -153,12 +153,12 @@ def load_trips():
         
 def load_stop_times():
     print "loading stop_times"
-    try:
-        stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
-        commit_objects(stop_times)
-    except:
-        print "Error in loading stop_times.txt"
-        db.session.rollback()
+    #try:
+    stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
+    commit_objects(stop_times)
+    #except:
+        #print "Error in loading stop_times.txt"
+        #db.session.rollback()
         
 def load_calendar():
     print "loading calendar"
