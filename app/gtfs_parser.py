@@ -43,9 +43,9 @@ def load_objects(file, name):
                 if name == "StopTime" and key == "trip_id":
                     set_trip_for_stop_time(obj, value)
                 elif name == "StopTime" and key == "arrival_time":
-                    set_arrival_for_stop_time(obj, value)
+                    obj.arrival_time = datetime_from_string(value)
                 elif name == "StopTime" and key == "departure_time":
-                    set_departure_for_stop_time(obj, value)
+                    obj.departure_time = datetime_from_string(value)
                 elif name == "StopTime" and key == "stop_id":
                     set_stop_for_stop_time(obj, value)
                 elif name == "Route" and key == "agency_id":
@@ -62,16 +62,19 @@ def load_objects(file, name):
         objects.append(obj)
     return objects
 
-def to_datetime_from_utc(time_tuple):
-    return datetime.fromtimestamp(timegm(time_tuple), tz = utc)
-def set_arrival_for_stop_time(stop_time, arrival_time_string):
-    if arrival_time_string == "24:00:00" or arrival_time_string == "24:01:00":
-        arrival_time_string = "23:59:59"
-    stop_time.arrival_time = to_datetime_from_utc(strptime(arrival_time_string, "%H:%M:%S"))
-def set_departure_for_stop_time(stop_time, departure_time_string):
-    if departure_time_string == "24:00:00" or departure_time_string == "24:01:00":
-        departure_time_string = "23:59:59"
-    stop_time.departure_time = to_datetime_from_utc(strptime(departure_time_string, "%H:%M:%S"))
+def datetime_from_string(string):
+    hr = string.split(":")[0]
+    if hr == "24":
+        l = list(string)
+        l[0] = "0"
+        l[1] = "0"
+        string = "".join(l)
+    def to_datetime_from_utc(time_tuple):
+        timestamp = timegm(time_tuple)
+        if hr == "24":
+            timestamp  = timestamp + 24*60*60
+        return datetime.fromtimestamp(timegm(time_tuple), tz = utc)    
+    return to_datetime_from_utc(strptime(string, "%H:%M:%S"))
 
 # this will always happen before setting the Stop ID for a stop_time
 # due to the ordering of trip_id and stop_id in GTFS
