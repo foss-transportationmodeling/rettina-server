@@ -73,8 +73,10 @@ def datetime_from_string(string):
         timestamp = timegm(time_tuple)
         if hr >= 24:
             timestamp  = timestamp + 24*60*60
-        return datetime.fromtimestamp(timegm(time_tuple), tz = utc)    
-    return to_datetime_from_utc(strptime(string, "%H:%M:%S"))
+        return datetime.fromtimestamp(timegm(time_tuple), tz = utc)
+    dt = to_datetime_from_utc(strptime(string, "%H:%M:%S"))
+    print dt
+    return dt
 
 # this will always happen before setting the Stop ID for a stop_time
 # due to the ordering of trip_id and stop_id in GTFS
