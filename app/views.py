@@ -4,13 +4,13 @@ mySQL db
 '''
 
 import urllib, zipfile, os, shutil, gtfs_parser
-from flask import jsonify, request, url_for
+from flask import jsonify, request, send_from_directory
 from app import app, db, models
 from sets import Set
 
 @app.route('/static/<path:path>')
 def send_static(path):
-    return url_for('static', filename = path + '.json')
+    return send_from_directory('static', path + '.json')
 
 @app.route('/agency', methods=['GET'])
 def get_agency():
