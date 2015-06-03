@@ -1,8 +1,4 @@
 from app import db, models
-from time import strptime
-from datetime import datetime
-from pytz import utc
-from calendar import timegm
 
 GTFS_PATH = "tmp/GTFS/"
 
@@ -42,10 +38,6 @@ def load_objects(file, name):
                 # handle special cases for setting relationships (and DateTime)
                 if name == "StopTime" and key == "trip_id":
                     set_trip_for_stop_time(obj, value)
-                elif name == "StopTime" and key == "arrival_time":
-                    obj.arrival_time = datetime_from_string(value)
-                elif name == "StopTime" and key == "departure_time":
-                    obj.departure_time = datetime_from_string(value)
                 elif name == "StopTime" and key == "stop_id":
                     set_stop_for_stop_time(obj, value)
                 elif name == "Route" and key == "agency_id":
@@ -61,23 +53,6 @@ def load_objects(file, name):
                 print "A value is missing from " + file
         objects.append(obj)
     return objects
-
-def datetime_from_string(string):
-    return string
-    #hr = int(string.split(":")[0])
-    #if hr >= 24:
-    #    l = list(string)
-    #    l[0] = "0"
-    #    l[1] = str(hr % 24)
-    #    string = "".join(l)
-    #def to_datetime_from_utc(time_tuple):
-    #    timestamp = timegm(time_tuple)
-    #    if hr >= 24:
-    #        timestamp  = timestamp + 24*60*60
-    #    return datetime.fromtimestamp(timegm(time_tuple), tz = utc)
-    #dt = to_datetime_from_utc(strptime(string, "%H:%M:%S"))
-    #print dt
-    #return dt
 
 # this will always happen before setting the Stop ID for a stop_time
 # due to the ordering of trip_id and stop_id in GTFS
@@ -156,12 +131,12 @@ def load_trips():
         
 def load_stop_times():
     print "loading stop_times"
-    try:
-        stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
-        commit_objects(stop_times)
-    except:
-        print "Error in loading stop_times.txt"
-        db.session.rollback()
+    #try:
+    stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
+    commit_objects(stop_times)
+    #except:
+        #print "Error in loading stop_times.txt"
+        #db.session.rollback()
         
 def load_calendar():
     print "loading calendar"
