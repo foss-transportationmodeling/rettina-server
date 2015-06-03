@@ -1,0 +1,164 @@
+{
+  "calendar_dates": [
+    {
+      "date": "20140901", 
+      "exception_type": 2, 
+      "service_id": "WK_F"
+    }, 
+    {
+      "date": "20140901", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20141123", 
+      "exception_type": 2, 
+      "service_id": "WK_F"
+    }, 
+    {
+      "date": "20141123", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20141124", 
+      "exception_type": 2, 
+      "service_id": "WK_F"
+    }, 
+    {
+      "date": "20141124", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20141125", 
+      "exception_type": 2, 
+      "service_id": "WK_F"
+    }, 
+    {
+      "date": "20141125", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20141126", 
+      "exception_type": 2, 
+      "service_id": "WK_F"
+    }, 
+    {
+      "date": "20141126", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20141127", 
+      "exception_type": 2, 
+      "service_id": "WK_F"
+    }, 
+    {
+      "date": "20141127", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20141128", 
+      "exception_type": 2, 
+      "service_id": "WK_F"
+    }, 
+    {
+      "date": "20141128", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20141129", 
+      "exception_type": 2, 
+      "service_id": "WK_F"
+    }, 
+    {
+      "date": "20141129", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20141225", 
+      "exception_type": 2, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20150101", 
+      "exception_type": 2, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20150315", 
+      "exception_type": 2, 
+      "service_id": "WK_S"
+    }, 
+    {
+      "date": "20150315", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20150316", 
+      "exception_type": 2, 
+      "service_id": "WK_S"
+    }, 
+    {
+      "date": "20150316", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20150317", 
+      "exception_type": 2, 
+      "service_id": "WK_S"
+    }, 
+    {
+      "date": "20150317", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20150318", 
+      "exception_type": 2, 
+      "service_id": "WK_S"
+    }, 
+    {
+      "date": "20150318", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20150319", 
+      "exception_type": 2, 
+      "service_id": "WK_S"
+    }, 
+    {
+      "date": "20150319", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20150320", 
+      "exception_type": 2, 
+      "service_id": "WK_S"
+    }, 
+    {
+      "date": "20150320", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }, 
+    {
+      "date": "20150321", 
+      "exception_type": 2, 
+      "service_id": "WK_S"
+    }, 
+    {
+      "date": "20150321", 
+      "exception_type": 1, 
+      "service_id": "B"
+    }
+  ]
+}

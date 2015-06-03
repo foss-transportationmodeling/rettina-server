@@ -1,0 +1,16 @@
+{
+  "calendar": [
+    {
+      "end_date": "20150509", 
+      "friday": 1, 
+      "monday": 1, 
+      "saturday": 0, 
+      "service_id": "WK_S", 
+      "start_date": "20150120", 
+      "sunday": 0, 
+      "thursday": 1, 
+      "tuesday": 1, 
+      "wednesday": 1
+    }
+  ]
+}
