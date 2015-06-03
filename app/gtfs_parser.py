@@ -1,6 +1,10 @@
 from app import db, models
+from time import strptime
+from datetime import datetime
+from pytz import utc
+from calendar import timegm
 
-GTFS_PATH = "tmp/GTFS/"
+GTFS_PATH = "tmp/GTFS/UC_GTFS/"
 
 def object_for_name(name):
     if name == "Agency":
@@ -38,6 +42,10 @@ def load_objects(file, name):
                 # handle special cases for setting relationships
                 if name == "StopTime" and key == "trip_id":
                     set_trip_for_stop_time(obj, value)
+                elif name == "StopTime" and key == "arrival_time":
+                    obj.arrival_time = datetime_from_string(value)
+                elif name == "StopTime" and key == "departure_time":
+                    obj.departure_time = datetime_from_string(value)
                 elif name == "StopTime" and key == "stop_id":
                     set_stop_for_stop_time(obj, value)
                 elif name == "Route" and key == "agency_id":
@@ -53,6 +61,20 @@ def load_objects(file, name):
     except IndexError:
         print "A value is missing from " + file
     return objects
+    
+def datetime_from_string(string):
+    hr = int(string.split(":")[0])
+    if hr >= 24:
+        l = list(string)
+        l[0] = "0"
+        l[1] = str(hr % 24)
+        string = "".join(l)
+    def to_datetime_from_utc(time_tuple):
+        timestamp = timegm(time_tuple)
+        if hr >= 24:
+            timestamp  = timestamp + 24*60*60
+        return datetime.fromtimestamp(timegm(time_tuple), tz = utc)    
+    return to_datetime_from_utc(strptime(string, "%H:%M:%S"))
 
 # this will always happen before setting the Stop ID for a stop_time
 # due to the ordering of trip_id and stop_id in GTFS
