@@ -41,10 +41,10 @@ class Stop(db.Model):
     def serialize(self):
         ats = None
         if not self.stop_times is None:
-            ats = [st.arrival_time for st in self.stop_times]
+            ats = [st.arrival_time.strftime("%H:%M:%S") for st in self.stop_times]
         dts = None
         if not self.stop_times is None:
-            dts = [st.departure_time for st in self.stop_times]
+            dts = [st.departure_time.strftime("%H:%M:%S") for st in self.stop_times]
         return {
             'stop_id' : self.stop_id,
             'stop_code' : self.stop_code,
