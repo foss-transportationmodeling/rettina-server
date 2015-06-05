@@ -39,19 +39,36 @@ def get_routes():
         lon1 = request.args.get('lon1', 999)
         lat2 = request.args.get('lat2', 999)
         lon2 = request.args.get('lon2', 999)
-        time = request.args.get('time', '')
-        invalid = lat1 == 999 or lon1 == 999 or lat2 == 999 or lon2 == 999
-        if invalid:
+        if lat1 == 999 or lon1 == 999 or lat2 == 999 or lon2 == 999:
             # the parameters provided cannot be used to filter, so return error
             return jsonify({ '404' : 'Bad URL Parameters'}), 404
         else:
             stop_times = []
-            if len(time) > 0:
-                # filter by latitude, longitude, and time
-                stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.arrival_time == time)
-            else:
+            start = request.args.get('start', '')
+            stop = request.args.get('stop', '')
+            
+            if len(stop) > 0 and len(start) == 0:
+                # the parameters provided cannot be used to filter, so return error
+                return jsonify({ '404' : 'Cannot have end time without start time'}), 404
+            elif len(start) == 0 and len(stop) == 0:
                 # filter by latitude and longitude only
                 stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2)
+            else:
+                start_time = None
+                stop_time = None
+                try:
+                    start_time = gtfs_parser.datetime_from_string(start)
+                    if len(stop) > 0:
+                        stop_time = gtfs_parser.datetime_from_string(stop)
+                except:
+                    return jsonify({ '404' : 'Cannot parse time'}), 404
+                if not stop_time is None:
+                    # filter within a range of time
+                    stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.arrival_time >= start_time, models.StopTime.departure_time <= stop_time)
+                else:
+                    # filter from initial time only
+                    stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.arrival_time >= start_time)
+                
             trips = Set()
             for stop_time in stop_times:
                 trips.add(stop_time.trip)
