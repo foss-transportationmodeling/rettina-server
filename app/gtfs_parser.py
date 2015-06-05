@@ -4,7 +4,10 @@ from datetime import datetime
 from pytz import utc
 from calendar import timegm
 
+# for UCONN GTFS only
 GTFS_PATH = "tmp/GTFS/UC_GTFS/"
+
+#GTFS_PATH = "tmp/GTFS/"
 
 def object_for_name(name):
     if name == "Agency":
@@ -53,6 +56,8 @@ def load_objects(file, name):
                 elif name == "Trip" and key == "route_id":
                     set_route_for_trip(obj, value)
                 elif name == "Shape" and key == "shape_id":
+                    # this is only relevant to the UCONN GTFS
+                    # TODO: find alternative for linking shapes to routes
                     set_route_for_shape(obj, value)
                 else:
                     if hasattr(obj, key):
