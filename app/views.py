@@ -33,6 +33,7 @@ def get_stops():
 @app.route('/routes', methods=['GET'])
 def get_routes():
     routes = None
+    valid_trips = None
     if len(request.args.keys()) > 0:
         # filter routes by the provided URL parameters
         lat1 = request.args.get('lat1', 999)
@@ -76,10 +77,11 @@ def get_routes():
             for trip in trips:
                 filtered_routes.add(trip.route)
             routes = filtered_routes
+            valid_trips = trips
     else:
         # otherwise, no URL parameters are provided, so return all routes
         routes = models.Route.query.all()
-    return jsonify({ 'routes' : [r.serialize() for r in routes] })
+    return jsonify({ 'routes' : [r.serialize(valid_trips = valid_trips) for r in routes] })
 
 @app.route('/trips', methods=['GET'])
 def get_trips():
