@@ -74,7 +74,7 @@ class Route(db.Model):
     route_text_color = db.Column(db.String(6), default = "000000")
     agency_id = db.Column(db.Integer, db.ForeignKey('agency.id'))
     agency = db.relationship('Agency', backref = db.backref('routes', lazy = 'dynamic'))
-    def serialize(self, valid_trips):
+    def serialize(self, valid_trips, n):
         a_name = None
         a_id = None
         if not self.agency is None:
@@ -86,9 +86,11 @@ class Route(db.Model):
                 # any trip will do, we aren't filtering out trips
                 t_ids = [trip.trip_id for trip in self.trips]
             else:
-                for trip in self.trips:
-                    if trip in valid_trips:
+                for trip in valid_trips:
+                    if trip in self.trips:
                         t_ids.append(trip.trip_id)
+                    if len(t_ids) == n:
+                        break
         return {
             'route_id' : self.route_id,
             'agency_id' : a_id,

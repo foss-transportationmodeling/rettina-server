@@ -34,6 +34,7 @@ def get_stops():
 def get_routes():
     routes = None
     valid_trips = None
+    n = request.args.get('next', 1)
     if len(request.args.keys()) > 0:
         # filter routes by the provided URL parameters
         lat1 = request.args.get('lat1', 999)
@@ -70,9 +71,12 @@ def get_routes():
                     # filter from initial time only
                     stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.arrival_time >= start_time)
                 
-            trips = Set()
+            stop_times.sort(key = lambda st: st.arrival_time, reverse = False)
+            trips = []
             for stop_time in stop_times:
-                trips.add(stop_time.trip)
+                trips.append(stop_time.trip)
+            trips = unique_array(trips)
+            
             filtered_routes = Set()
             for trip in trips:
                 filtered_routes.add(trip.route)
@@ -81,8 +85,12 @@ def get_routes():
     else:
         # otherwise, no URL parameters are provided, so return all routes
         routes = models.Route.query.all()
-    return jsonify({ 'routes' : [r.serialize(valid_trips = valid_trips) for r in routes] })
-
+        
+    return jsonify({ 'routes' : [r.serialize(valid_trips, n) for r in routes] })
+def unique_array(regular_array): # Order preserving
+  seen = set()
+  return [x for x in regular_array if x not in seen and not seen.add(x)]
+  
 @app.route('/trips', methods=['GET'])
 def get_trips():
     trips = models.Trip.query.all()
