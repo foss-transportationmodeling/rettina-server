@@ -71,6 +71,7 @@ def get_routes():
                     # filter from initial time only
                     stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.arrival_time >= start_time)
                 
+            stop_times = array_from_query(stop_times)
             stop_times.sort(key = lambda st: st.arrival_time, reverse = False)
             trips = []
             for stop_time in stop_times:
@@ -87,6 +88,11 @@ def get_routes():
         routes = models.Route.query.all()
         
     return jsonify({ 'routes' : [r.serialize(valid_trips, n) for r in routes] })
+def array_from_query(q):
+    a = []
+    for item in q:
+        a.append(item)
+    return a
 def unique_array(regular_array): # Order preserving
   seen = set()
   return [x for x in regular_array if x not in seen and not seen.add(x)]
