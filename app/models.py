@@ -89,7 +89,7 @@ class Route(db.Model):
                 for trip in valid_trips:
                     if trip in self.trips:
                         t_ids.append(trip.trip_id)
-                    if len(t_ids) == n:
+                    if len(t_ids) >= n:
                         break
         return {
             'route_id' : self.route_id,

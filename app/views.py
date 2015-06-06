@@ -34,7 +34,11 @@ def get_stops():
 def get_routes():
     routes = None
     valid_trips = None
-    n = request.args.get('next', 1)
+    n = 1
+    try:
+        n = int(request.args.get('next', 1))
+    except ValueError:
+        return jsonify({ '404' : 'Cannot parse \'next\' parameter'}), 404
     if len(request.args.keys()) > 0:
         # filter routes by the provided URL parameters
         lat1 = request.args.get('lat1', 999)
