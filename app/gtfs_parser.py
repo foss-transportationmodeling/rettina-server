@@ -110,7 +110,7 @@ def set_route_for_trip(trip, route_id):
         
 def set_shapes_for_trip(trip, shape_id):
     shapes = models.Shape.query.filter(models.Shape.shape_id == shape_id).all()
-    if not shaps is None:
+    if not shapes is None:
         trip.shapes = shapes
 
 def commit_objects(objects):
@@ -156,12 +156,12 @@ def load_trips():
         
 def load_stop_times():
     print "loading stop_times"
-    #try:
-    stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
-    commit_objects(stop_times)
-    #except:
-        #print "Error in loading stop_times.txt"
-        #db.session.rollback()
+    try:
+        stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
+        commit_objects(stop_times)
+    except:
+        print "Error in loading stop_times.txt"
+        db.session.rollback()
         
 def load_calendar():
     print "loading calendar"
