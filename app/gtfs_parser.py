@@ -111,7 +111,9 @@ def set_route_for_trip(trip, route_id):
 def set_shapes_for_trip(trip, shape_id):
     shapes = models.Shape.query.filter(models.Shape.shape_id == shape_id).all()
     if not shapes is None:
-        trip.shapes = shapes
+        for shape in shapes:
+            shape.trip = trip
+            db.session.add(shape)
 
 def commit_objects(objects):
     for obj in objects:
