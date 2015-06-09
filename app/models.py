@@ -129,7 +129,7 @@ class Trip(db.Model):
         if not self.route is None:
             r_id = self.route.route_id
         s_id = None
-        if (not self.shapes is None) and len(self.shapes) > 0:
+        if not self.shapes is None:
             s_id = self.shapes[0].shape_id
         return {
             'route_id' : r_id,
