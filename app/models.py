@@ -118,7 +118,6 @@ class Trip(db.Model):
     trip_short_name = db.Column(db.String(64))
     direction_id = db.Column(db.Integer)
     block_id = db.Column(db.Integer)
-    shape_id = db.Column(db.Integer)
     wheelchair_accessible = db.Column(db.Integer)
     bikes_allowed = db.Column(db.Integer)
     stops = db.relationship('Stop', secondary = stops, 
@@ -129,6 +128,9 @@ class Trip(db.Model):
         r_id = None
         if not self.route is None:
             r_id = self.route.route_id
+        s_id = None
+        if (not self.shapes is None) and len(self.shapes) > 0:
+            s_id = self.shapes[0].shape_id
         return {
             'route_id' : r_id,
             'service_id' : self.service_id,
@@ -137,7 +139,7 @@ class Trip(db.Model):
             'trip_short_name' : self.trip_short_name,
             'direction_id' : self.direction_id,
             'block_id' : self.block_id,
-            'shape_id' : self.shape_id,
+            'shape_id' : s_id,
             'wheelchair_accessible' : self.wheelchair_accessible,
             'bikes_allowed' : self.bikes_allowed
         }
@@ -220,18 +222,16 @@ class CalendarDate(db.Model):
 
 class Shape(db.Model):
     id = db.Column(db.Integer, primary_key = True)
+    shape_id = db.Column(db.Integer)
     shape_pt_lat = db.Column(db.Float)
     shape_pt_lon = db.Column(db.Float)
     shape_pt_sequence = db.Column(db.Integer)
     shape_dist_traveled = db.Column(db.Float)
-    route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
-    route = db.relationship('Route', backref = db.backref('shapes', lazy = 'dynamic'))
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref = db.backref('shapes', lazy = 'dynamic'))
     def serialize(self):
-        r_id = None
-        if not self.route is None:
-            r_id = self.route.route_id
         return {
-            'shape_id' : r_id,
+            'shape_id' : shape_id,
             'shape_pt_lat' : self.shape_pt_lat,
             'shape_pt_lon' : self.shape_pt_lon,
             'shape_pt_sequence' : self.shape_pt_sequence,
