@@ -130,9 +130,9 @@ def get_shapes():
     else:
         trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
         if not trip is None:
-            shapes = trip.shapes
+            shapes = models.Shape.query.filter(models.Shape.shape_id == trip.shape_id).all()
         else:
-            return jsonify({ '404' : 'No Shapes Found' })
+            return jsonify({ '404' : 'Invalid Trip ID' })
     return jsonify({ 'shapes' : [s.serialize() for s in shapes] })    
 
 @app.route('/load_gtfs', methods=['GET'])

@@ -114,6 +114,7 @@ class Trip(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     service_id = db.Column(db.String(32))
     trip_id = db.Column(db.String(32), unique = True)
+    shape_id = db.Column(db.Integer)
     trip_headsign = db.Column(db.String(32))
     trip_short_name = db.Column(db.String(64))
     direction_id = db.Column(db.Integer)
@@ -128,11 +129,6 @@ class Trip(db.Model):
         r_id = None
         if not self.route is None:
             r_id = self.route.route_id
-        s_id = None
-        if not self.shapes is None:
-            for shape in self.shapes:
-                s_id = shape.shape_id
-                break
         return {
             'route_id' : r_id,
             'service_id' : self.service_id,
@@ -141,7 +137,7 @@ class Trip(db.Model):
             'trip_short_name' : self.trip_short_name,
             'direction_id' : self.direction_id,
             'block_id' : self.block_id,
-            'shape_id' : s_id,
+            'shape_id' : self.shape_id,
             'wheelchair_accessible' : self.wheelchair_accessible,
             'bikes_allowed' : self.bikes_allowed
         }
@@ -229,8 +225,6 @@ class Shape(db.Model):
     shape_pt_lon = db.Column(db.Float)
     shape_pt_sequence = db.Column(db.Integer)
     shape_dist_traveled = db.Column(db.Float)
-    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref = db.backref('shapes', lazy = 'dynamic'))
     def serialize(self):
         return {
             'shape_id' : self.shape_id,

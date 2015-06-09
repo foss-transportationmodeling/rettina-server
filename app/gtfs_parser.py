@@ -55,8 +55,6 @@ def load_objects(file, name):
                     set_agency_for_route(obj, value)
                 elif name == "Trip" and key == "route_id":
                     set_route_for_trip(obj, value)
-                elif name == "Trip" and key == "shape_id":
-                    set_shapes_for_trip(obj, value)
                 else:
                     if hasattr(obj, key):
                         setattr(obj, key, value)
@@ -107,13 +105,6 @@ def set_route_for_trip(trip, route_id):
     route = models.Route.query.filter(models.Route.route_id == route_id).first()
     if not route is None:
         trip.route = route
-        
-def set_shapes_for_trip(trip, shape_id):
-    shapes = models.Shape.query.filter(models.Shape.shape_id == shape_id).all()
-    if not shapes is None:
-        for shape in shapes:
-            shape.trip = trip
-            db.session.add(shape)
 
 def commit_objects(objects):
     for obj in objects:
@@ -196,8 +187,6 @@ def load_all():
     # the order is important (necessary for relationships):
     # agencies must be loaded before routes
     load_agency()
-    # shapes must be loaded before trips
-    load_shapes()
     # routes must be loaded before trips and before shapes
     load_routes()
     # trips must be loaded before stop_times
@@ -207,5 +196,6 @@ def load_all():
     load_stop_times()
     load_calendar()
     load_calendar_dates()
+    load_shapes()
 
 
