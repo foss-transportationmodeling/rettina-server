@@ -5,9 +5,9 @@ from pytz import utc
 from calendar import timegm
 
 # for UCONN GTFS only
-GTFS_PATH = "tmp/GTFS/UC_GTFS/"
+#GTFS_PATH = "tmp/GTFS/UC_GTFS/"
 
-#GTFS_PATH = "tmp/GTFS/"
+GTFS_PATH = "tmp/GTFS/"
 
 def object_for_name(name):
     if name == "Agency":
