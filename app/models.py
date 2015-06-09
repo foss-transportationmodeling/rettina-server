@@ -130,7 +130,9 @@ class Trip(db.Model):
             r_id = self.route.route_id
         s_id = None
         if not self.shapes is None:
-            s_id = self.shapes[0].shape_id
+            for shape in self.shapes:
+                s_id = shape.shape_id
+                break
         return {
             'route_id' : r_id,
             'service_id' : self.service_id,
