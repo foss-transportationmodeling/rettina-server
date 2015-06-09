@@ -233,7 +233,7 @@ class Shape(db.Model):
     trip = db.relationship('Trip', backref = db.backref('shapes', lazy = 'dynamic'))
     def serialize(self):
         return {
-            'shape_id' : shape_id,
+            'shape_id' : self.shape_id,
             'shape_pt_lat' : self.shape_pt_lat,
             'shape_pt_lon' : self.shape_pt_lon,
             'shape_pt_sequence' : self.shape_pt_sequence,
