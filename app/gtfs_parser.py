@@ -31,7 +31,6 @@ def object_for_name(name):
 def load_objects(file, name):
     objects = []
     f = open(file, 'r')
-    dataset_id = file.split('/').last().split('.')[0]
     clean_first_line = f.readline().strip().replace(' ', '')
     keys = clean_first_line.split(',')
     try:
@@ -185,6 +184,7 @@ def load_shapes():
         db.session.rollback()
 
 def load_all(d_id):
+    global dataset_id
     dataset_id = d_id
     # the order is important (necessary for relationships):
     # agencies must be loaded before routes
