@@ -140,7 +140,7 @@ def load_gtfs(dataset_id):
     zfile = zipfile.ZipFile(dataset_id + '.zip')
     zfile.extractall('tmp/GTFS/')
     delete_all_records()
-    gtfs_parser.load_all()
+    gtfs_parser.load_all(dataset_id)
     shutil.rmtree('tmp/GTFS')
     return jsonify({ '200' : 'Data Loaded' })
 def delete_all_records():
