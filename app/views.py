@@ -9,7 +9,7 @@ from app import app, db, models
 from sets import Set
 
 @app.route('/agency/<dataset_id>', methods=['GET'])
-def get_agency():
+def get_agency(dataset_id):
     url_args = request.args
     for key in url_args:
         print key + " : " + url_args[key]
@@ -17,7 +17,7 @@ def get_agency():
     return jsonify({ 'agencies' : [a.serialize() for a in agencies] })
 
 @app.route('/stops/<dataset_id>', methods=['GET'])
-def get_stops():
+def get_stops(dataset_id):
     stops = None
     trip_id = request.args.get('trip_id', '')
     if len(trip_id) == 0:
@@ -31,7 +31,7 @@ def get_stops():
     return jsonify({ 'stops' : [s.serialize() for s in stops] })
 
 @app.route('/routes/<dataset_id>', methods=['GET'])
-def get_routes():
+def get_routes(dataset_id):
     routes = None
     valid_trips = None
     n = 1
@@ -102,27 +102,27 @@ def unique_array(regular_array): # Order preserving
   return [x for x in regular_array if x not in seen and not seen.add(x)]
   
 @app.route('/trips/<dataset_id>', methods=['GET'])
-def get_trips():
+def get_trips(dataset_id):
     trips = models.Trip.query.filter(models.Trip.dataset_id == dataset_id)
     return jsonify({ 'trips' : [t.serialize() for t in trips] })
 
 @app.route('/stop_times/<dataset_id>', methods=['GET'])
-def get_stop_times():
+def get_stop_times(dataset_id):
     stop_times = models.StopTime.query.filter(models.StopTime.dataset_id == dataset_id)
     return jsonify({ 'stop_times' : [st.serialize() for st in stop_times] })
 
 @app.route('/calendar/<dataset_id>', methods=['GET'])
-def get_calendar():
+def get_calendar(dataset_id):
     calendar = models.Calendar.query.filter(models.Calendar.dataset_id == dataset_id)
     return jsonify({ 'calendar' : [c.serialize() for c in calendar] })
     
 @app.route('/calendar_dates/<dataset_id>', methods=['GET'])
-def get_calendar_dates():
+def get_calendar_dates(dataset_id):
     cal_dates = models.CalendarDate.query.filter(models.CalendarDate.dataset_id == dataset_id)
     return jsonify({ 'calendar_dates' : [cd.serialize() for cd in cal_dates] })
     
 @app.route('/shapes/<dataset_id>', methods=['GET'])
-def get_shapes():
+def get_shapes(dataset_id):
     shapes = None
     trip_id = request.args.get('trip_id', '')
     if len(trip_id) == 0:
@@ -136,7 +136,7 @@ def get_shapes():
     return jsonify({ 'shapes' : [s.serialize() for s in shapes] })    
 
 @app.route('/load_gtfs/<dataset_id>', methods=['GET'])
-def load_gtfs():
+def load_gtfs(dataset_id):
     zfile = zipfile.ZipFile(dataset_id + '.zip')
     zfile.extractall('tmp/GTFS/')
     delete_all_records()
