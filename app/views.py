@@ -8,29 +8,29 @@ from flask import jsonify, request
 from app import app, db, models
 from sets import Set
 
-@app.route('/agency', methods=['GET'])
+@app.route('/agency/<dataset_id>', methods=['GET'])
 def get_agency():
     url_args = request.args
     for key in url_args:
         print key + " : " + url_args[key]
-    agencies = models.Agency.query.all()
+    agencies = models.Agency.query.filter(models.Agency.dataset_id == dataset_id)
     return jsonify({ 'agencies' : [a.serialize() for a in agencies] })
 
-@app.route('/stops', methods=['GET'])
+@app.route('/stops/<dataset_id>', methods=['GET'])
 def get_stops():
     stops = None
     trip_id = request.args.get('trip_id', '')
     if len(trip_id) == 0:
-        stops = models.Stop.query.all()
+        stops = models.Stop.query.filter(models.Stop.dataset_id == dataset_id)
     else:
-        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
+        trip = models.Trip.query.filter(models.Trip.dataset_id == dataset_id, models.Trip.trip_id == trip_id).first()
         if not trip is None:
             stops = trip.stops
         else:
             return jsonify({ '404' : 'No Stops Found' })
     return jsonify({ 'stops' : [s.serialize() for s in stops] })
 
-@app.route('/routes', methods=['GET'])
+@app.route('/routes/<dataset_id>', methods=['GET'])
 def get_routes():
     routes = None
     valid_trips = None
@@ -58,7 +58,7 @@ def get_routes():
                 return jsonify({ '404' : 'Cannot have end time without start time'}), 404
             elif len(start) == 0 and len(stop) == 0:
                 # filter by latitude and longitude only
-                stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2)
+                stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.dataset_id == dataset_id)
             else:
                 start_time = None
                 stop_time = None
@@ -70,10 +70,10 @@ def get_routes():
                     return jsonify({ '404' : 'Cannot parse time'}), 404
                 if not stop_time is None:
                     # filter within a range of time
-                    stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.arrival_time >= start_time, models.StopTime.departure_time <= stop_time)
+                    stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.arrival_time >= start_time, models.StopTime.departure_time <= stop_time, models.StopTime.dataset_id == dataset_id)
                 else:
                     # filter from initial time only
-                    stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.arrival_time >= start_time)
+                    stop_times = models.StopTime.query.filter(models.StopTime.stop_lon >= lon1, models.StopTime.stop_lon <= lon2, models.StopTime.stop_lat >= lat1, models.StopTime.stop_lat <= lat2, models.StopTime.arrival_time >= start_time, models.StopTime.dataset_id == dataset_id)
                 
             stop_times = array_from_query(stop_times)
             stop_times.sort(key = lambda st: st.arrival_time, reverse = False)
@@ -89,7 +89,7 @@ def get_routes():
             valid_trips = trips
     else:
         # otherwise, no URL parameters are provided, so return all routes
-        routes = models.Route.query.all()
+        routes = models.Route.query.filter(models.Route.dataset_id == dataset_id)
         
     return jsonify({ 'routes' : [r.serialize(valid_trips, n) for r in routes] })
 def array_from_query(q):
@@ -101,43 +101,43 @@ def unique_array(regular_array): # Order preserving
   seen = set()
   return [x for x in regular_array if x not in seen and not seen.add(x)]
   
-@app.route('/trips', methods=['GET'])
+@app.route('/trips/<dataset_id>', methods=['GET'])
 def get_trips():
-    trips = models.Trip.query.all()
+    trips = models.Trip.query.filter(models.Trip.dataset_id == dataset_id)
     return jsonify({ 'trips' : [t.serialize() for t in trips] })
 
-@app.route('/stop_times', methods=['GET'])
+@app.route('/stop_times/<dataset_id>', methods=['GET'])
 def get_stop_times():
-    stop_times = models.StopTime.query.all()
+    stop_times = models.StopTime.query.filter(models.StopTime.dataset_id == dataset_id)
     return jsonify({ 'stop_times' : [st.serialize() for st in stop_times] })
 
-@app.route('/calendar', methods=['GET'])
+@app.route('/calendar/<dataset_id>', methods=['GET'])
 def get_calendar():
-    calendar = models.Calendar.query.filter(models.Calendar.friday == 1, models.Calendar.end_date == "20150509")
+    calendar = models.Calendar.query.filter(models.Calendar.dataset_id == dataset_id)
     return jsonify({ 'calendar' : [c.serialize() for c in calendar] })
     
-@app.route('/calendar_dates', methods=['GET'])
+@app.route('/calendar_dates/<dataset_id>', methods=['GET'])
 def get_calendar_dates():
-    cal_dates = models.CalendarDate.query.all()
+    cal_dates = models.CalendarDate.query.filter(models.CalendarDate.dataset_id == dataset_id)
     return jsonify({ 'calendar_dates' : [cd.serialize() for cd in cal_dates] })
     
-@app.route('/shapes', methods=['GET'])
+@app.route('/shapes/<dataset_id>', methods=['GET'])
 def get_shapes():
     shapes = None
     trip_id = request.args.get('trip_id', '')
     if len(trip_id) == 0:
-        shapes = models.Shape.query.all()
+        shapes = models.Shape.query.filter(models.Shape.dataset_id == dataset_id)
     else:
-        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
+        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id, models.Trip.dataset_id == dataset_id).first()
         if not trip is None:
-            shapes = models.Shape.query.filter(models.Shape.shape_id == trip.shape_id).all()
+            shapes = models.Shape.query.filter(models.Shape.shape_id == trip.shape_id, models.Shape.dataset_id == dataset_id)
         else:
             return jsonify({ '404' : 'Invalid Trip ID' })
     return jsonify({ 'shapes' : [s.serialize() for s in shapes] })    
 
-@app.route('/load_gtfs', methods=['GET'])
+@app.route('/load_gtfs/<dataset_id>', methods=['GET'])
 def load_gtfs():
-    zfile = zipfile.ZipFile('UC_GTFS.zip')
+    zfile = zipfile.ZipFile(dataset_id + '.zip')
     zfile.extractall('tmp/GTFS/')
     delete_all_records()
     gtfs_parser.load_all()

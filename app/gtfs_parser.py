@@ -4,9 +4,6 @@ from datetime import datetime
 from pytz import utc
 from calendar import timegm
 
-# for UCONN GTFS only
-#GTFS_PATH = "tmp/GTFS/UC_GTFS/"
-
 GTFS_PATH = "tmp/GTFS/"
 
 def object_for_name(name):
@@ -32,6 +29,7 @@ def object_for_name(name):
 def load_objects(file, name):
     objects = []
     f = open(file, 'r')
+    dataset_id = file.split('.')[0]
     clean_first_line = f.readline().strip().replace(' ', '')
     keys = clean_first_line.split(',')
     try:
@@ -58,6 +56,7 @@ def load_objects(file, name):
                 else:
                     if hasattr(obj, key):
                         setattr(obj, key, value)
+            obj.dataset_id = dataset_id
             objects.append(obj)
     except IndexError:
         print "A value is missing from " + file

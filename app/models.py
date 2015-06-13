@@ -12,6 +12,7 @@ class Agency(db.Model):
     agency_phone = db.Column(db.String(32))
     agency_lang = db.Column(db.String(2))
     agency_fare_url = db.Column(db.String(256))
+    dataset_id = db.Column(db.String(32))
     def serialize(self):
         return {
             'agency_id' : self.agency_id,
@@ -38,6 +39,7 @@ class Stop(db.Model):
     parent_station = db.Column(db.String(32))
     stop_timezone = db.Column(db.String(2))
     wheelchair_boarding = db.Column(db.Integer)
+    dataset_id = db.Column(db.String(32))
     def serialize(self):
         ats = None
         if not self.stop_times is None:
@@ -74,6 +76,7 @@ class Route(db.Model):
     route_text_color = db.Column(db.String(6), default = "000000")
     agency_id = db.Column(db.Integer, db.ForeignKey('agency.id'))
     agency = db.relationship('Agency', backref = db.backref('routes', lazy = 'dynamic'))
+    dataset_id = db.Column(db.String(32))
     def serialize(self, valid_trips, n):
         a_name = None
         a_id = None
@@ -125,6 +128,7 @@ class Trip(db.Model):
         backref = db.backref('trips', lazy = 'dynamic'))
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
     route = db.relationship('Route', backref = db.backref('trips', lazy = 'dynamic'))
+    dataset_id = db.Column(db.String(32))
     def serialize(self):
         r_id = None
         if not self.route is None:
@@ -158,6 +162,7 @@ class StopTime(db.Model):
     timepoint = db.Column(db.Integer)
     stop_lat = db.Column(db.Float)
     stop_lon = db.Column(db.Float)
+    dataset_id = db.Column(db.String(32))
     def serialize(self):
         s_id = None
         if not self.stop is None:
@@ -192,6 +197,7 @@ class Calendar(db.Model):
     sunday = db.Column(db.Integer)
     start_date = db.Column(db.String(16))
     end_date = db.Column(db.String(16))
+    dataset_id = db.Column(db.String(32))
     def serialize(self):
         return {
             'service_id' : self.service_id,
@@ -211,6 +217,7 @@ class CalendarDate(db.Model):
     service_id = db.Column(db.String(32))
     date = db.Column(db.String(16))
     exception_type = db.Column(db.Integer)
+    dataset_id = db.Column(db.String(32))
     def serialize(self):
         return {
             'service_id' : self.service_id,
@@ -225,6 +232,7 @@ class Shape(db.Model):
     shape_pt_lon = db.Column(db.Float)
     shape_pt_sequence = db.Column(db.Integer)
     shape_dist_traveled = db.Column(db.Float)
+    dataset_id = db.Column(db.String(32))
     def serialize(self):
         return {
             'shape_id' : self.shape_id,
