@@ -147,6 +147,7 @@ class Trip(db.Model):
         }
         
 class Comment(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref = db.backref('comments', lazy = 'dynamic'))
     text = db.Column(db.Text)
@@ -155,6 +156,7 @@ class Comment(db.Model):
         return { 'text' : self.text }
         
 class QualityRating(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref = db.backref('ratings', lazy = 'dynamic'))
     rating = db.Column(db.Float)
@@ -163,6 +165,7 @@ class QualityRating(db.Model):
         return { 'rating' : self.rating }
         
 class Datapoint(db.Model):
+    id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref = db.backref('datapoints', lazy = 'dynamic'))
     x = db.Column(db.Float)
