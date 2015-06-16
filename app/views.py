@@ -113,7 +113,7 @@ def create_comment(dataset_id):
     text = request.args.get('text', '')
     if len(trip_id) == 0:
         return jsonify({ '404' : 'Must provide a Trip ID for the comment' })
-    else if len(text) == 0:
+    elif len(text) == 0:
         return jsonify({  '404' : 'Must provide text for the comment' })
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id, models.Trip.dataset_id == dataset_id).first()
     if trip is None:
@@ -129,7 +129,7 @@ def create_quality_rating(dataset_id):
     rating = request.args.get('rating', '')
     if len(trip_id) == 0:
         return jsonify({ '404' : 'Must provide a Trip ID for the rating' })
-    else if len(rating) == 0:
+    elif len(rating) == 0:
         return jsonify({  '404' : 'Must provide a rating value' })
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id, models.Trip.dataset_id == dataset_id).first()
     if trip is None:
@@ -147,7 +147,7 @@ def create_datapoint(dataset_id):
     timestamp = datetime.utcnow()
     if len(trip_id) == 0:
         return jsonify({ '404' : 'Must provide a Trip ID for the rating' })
-    else if len(x) == 0 or len(y) == 0:
+    elif len(x) == 0 or len(y) == 0:
         return jsonify({  '404' : 'Must provide x and y values' })
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id, models.Trip.dataset_id == dataset_id).first()
     if trip is None:
