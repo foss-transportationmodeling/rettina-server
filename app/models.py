@@ -143,7 +143,7 @@ class Trip(db.Model):
             'block_id' : self.block_id,
             'shape_id' : self.shape_id,
             'wheelchair_accessible' : self.wheelchair_accessible,
-            'bikes_allowed' : self.bikes_allowed
+            'bikes_allowed' : self.bikes_allowed,
             'comments' : [c.serialize() for c in self.comments],
             'ratings' : [r.serialize() for r in self.ratings],
             'datapoints' : [d.serialize() for d in self.datapoints]
