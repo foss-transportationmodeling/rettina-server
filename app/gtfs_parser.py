@@ -112,7 +112,7 @@ def commit_objects(objects):
     db.session.commit()
 
 def load_agency():
-    print "loading agencies"
+    print "loading agencies for " + dataset_id
     try:
         agencies = load_objects(GTFS_PATH + "agency.txt", "Agency")
         commit_objects(agencies)
@@ -121,7 +121,7 @@ def load_agency():
         db.session.rollback()
         
 def load_stops():
-    print "loading stops"
+    print "loading stops for " + dataset_id
     try:
         stops = load_objects(GTFS_PATH + "stops.txt", "Stop")
         commit_objects(stops)
@@ -130,7 +130,7 @@ def load_stops():
         db.session.rollback()
         
 def load_routes():
-    print "loading routes"
+    print "loading routes for " + dataset_id
     try:
         routes = load_objects(GTFS_PATH + "routes.txt", "Route")
         commit_objects(routes)
@@ -139,7 +139,7 @@ def load_routes():
         db.session.rollback()
         
 def load_trips():
-    print "loading trips"
+    print "loading trips for " + dataset_id
     try:
         trips = load_objects(GTFS_PATH + "trips.txt", "Trip")
         commit_objects(trips)
@@ -148,7 +148,7 @@ def load_trips():
         db.session.rollback()
         
 def load_stop_times():
-    print "loading stop_times"
+    print "loading stop_times for " + dataset_id
     try:
         stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
         commit_objects(stop_times)
@@ -157,7 +157,7 @@ def load_stop_times():
         db.session.rollback()
         
 def load_calendar():
-    print "loading calendar"
+    print "loading calendar for " + dataset_id
     try:
         calendar = load_objects(GTFS_PATH + "calendar.txt", "Calendar")
         commit_objects(calendar)
@@ -166,7 +166,7 @@ def load_calendar():
         db.session.rollback()
         
 def load_calendar_dates():
-    print "loading calendar dates"
+    print "loading calendar dates for " + dataset_id
     try:
         calendar_dates = load_objects(GTFS_PATH + "calendar_dates.txt", "CalendarDate")
         commit_objects(calendar_dates)
@@ -175,7 +175,7 @@ def load_calendar_dates():
         db.session.rollback()
         
 def load_shapes():
-    print "loading shapes"
+    print "loading shapes for " + dataset_id
     try:
         shapes = load_objects(GTFS_PATH + "shapes.txt", "Shape")
         commit_objects(shapes)

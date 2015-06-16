@@ -144,6 +144,9 @@ class Trip(db.Model):
             'shape_id' : self.shape_id,
             'wheelchair_accessible' : self.wheelchair_accessible,
             'bikes_allowed' : self.bikes_allowed
+            'comments' : [c.serialize() for c in self.comments],
+            'ratings' : [r.serialize() for r in self.ratings],
+            'datapoints' : [d.serialize() for d in self.datapoints]
         }
         
 class Comment(db.Model):
