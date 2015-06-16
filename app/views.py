@@ -3,7 +3,7 @@ Top left + bottom right corner of box -> filter stops by lat & long
 mySQL db
 '''
 
-import urllib, zipfile, os, shutil, gtfs_parser
+import urllib, zipfile, os, shutil, gtfs_parser, glob
 from flask import jsonify, request
 from app import app, db, models
 from sets import Set
@@ -146,7 +146,7 @@ def create_datapoint(dataset_id):
     y = request.args.get('y', '')
     timestamp = datetime.utcnow()
     if len(trip_id) == 0:
-        return jsonify({ '404' : 'Must provide a Trip ID for the rating' })
+        return jsonify({ '404' : 'Must provide a Trip ID for the datapoint' })
     elif len(x) == 0 or len(y) == 0:
         return jsonify({  '404' : 'Must provide x and y values' })
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id, models.Trip.dataset_id == dataset_id).first()
@@ -186,13 +186,14 @@ def get_shapes(dataset_id):
             return jsonify({ '404' : 'Invalid Trip ID' })
     return jsonify({ 'shapes' : [s.serialize() for s in shapes] })    
 
-@app.route('/load_gtfs/<dataset_id>', methods=['GET'])
-def load_gtfs(dataset_id):
-    zfile = zipfile.ZipFile(dataset_id + '.zip')
-    zfile.extractall('tmp/GTFS/')
+@app.route('/load_gtfs', methods=['GET'])
+def load_gtfs():
     delete_all_records()
-    gtfs_parser.load_all(dataset_id)
-    shutil.rmtree('tmp/GTFS')
+    for file in glob.glob('*.zip'):
+        zfile = zipfile.ZipFile(file)
+        zfile.extractall('tmp/GTFS/')
+        gtfs_parser.load_all(file.split('.')[0])
+        shutil.rmtree('tmp/GTFS')
     return jsonify({ '200' : 'Data Loaded' })
 def delete_all_records():
     a = models.Agency.query.delete()
