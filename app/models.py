@@ -145,6 +145,36 @@ class Trip(db.Model):
             'wheelchair_accessible' : self.wheelchair_accessible,
             'bikes_allowed' : self.bikes_allowed
         }
+        
+class Comment(db.Model):
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref = db.backref('comments', lazy = 'dynamic'))
+    text = db.Column(db.Text)
+    dataset_id = db.Column(db.String(32))
+    def serialize(self):
+        return { 'text' : self.text }
+        
+class QualityRating(db.Model):
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref = db.backref('ratings', lazy = 'dynamic'))
+    rating = db.Column(db.Float)
+    dataset_id = db.Column(db.String(32))
+    def serialize(self):
+        return { 'rating' : self.rating }
+        
+class Datapoint(db.Model):
+    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
+    trip = db.relationship('Trip', backref = db.backref('datapoints', lazy = 'dynamic'))
+    x = db.Column(db.Float)
+    y = db.Column(db.Float)
+    timestamp = db.Column(db.DateTime)
+    dataset_id = db.Column(db.String(32))
+    def serialize(self):
+        return {
+            'x' : self.x,
+            'y' : self.y,
+            'timestamp' : self.timestamp
+        }
     
 class StopTime(db.Model):
     id = db.Column(db.Integer, primary_key = True)

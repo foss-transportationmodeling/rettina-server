@@ -7,6 +7,7 @@ import urllib, zipfile, os, shutil, gtfs_parser
 from flask import jsonify, request
 from app import app, db, models
 from sets import Set
+from datetime import datetime
 
 @app.route('/agency/<dataset_id>', methods=['GET'])
 def get_agency(dataset_id):
@@ -105,6 +106,56 @@ def unique_array(regular_array): # Order preserving
 def get_trips(dataset_id):
     trips = models.Trip.query.filter(models.Trip.dataset_id == dataset_id)
     return jsonify({ 'trips' : [t.serialize() for t in trips] })
+    
+@app.route('/comments/<dataset_id>', methods=['POST'])
+def create_comment(dataset_id):
+    trip_id = request.args.get('trip_id', '')
+    text = request.args.get('text', '')
+    if len(trip_id) == 0:
+        return jsonify({ '404' : 'Must provide a Trip ID for the comment' })
+    else if len(text) == 0:
+        return jsonify({  '404' : 'Must provide text for the comment' })
+    trip = models.Trip.query.filter(models.Trip.trip_id == trip_id, models.Trip.dataset_id == dataset_id).first()
+    if trip is None:
+        return jsonify({ '404' : 'Invalid Trip ID' })
+    comment = models.Comment(text = text, dataset_id = dataset_id, trip = trip)
+    db.session.add(comment)
+    db.session.commit()
+    return jsonify(comment.serialize()), 200
+
+@app.route('/ratings/<dataset_id>', methods=['POST'])
+def create_quality_rating(dataset_id):
+    trip_id = request.args.get('trip_id', '')
+    rating = request.args.get('rating', '')
+    if len(trip_id) == 0:
+        return jsonify({ '404' : 'Must provide a Trip ID for the rating' })
+    else if len(rating) == 0:
+        return jsonify({  '404' : 'Must provide a rating value' })
+    trip = models.Trip.query.filter(models.Trip.trip_id == trip_id, models.Trip.dataset_id == dataset_id).first()
+    if trip is None:
+        return jsonify({ '404' : 'Invalid Trip ID' })
+    quality_rating = models.QualityRating(rating = rating, dataset_id = dataset_id, trip = trip)
+    db.session.add(quality_rating)
+    db.session.commit()
+    return jsonify(quality_rating.serialize()), 200
+    
+@app.route('/datapoints/<dataset_id>', methods=['POST'])
+def create_datapoint(dataset_id):
+    trip_id = request.args.get('trip_id', '')
+    x = request.args.get('x', '')
+    y = request.args.get('y', '')
+    timestamp = datetime.utcnow()
+    if len(trip_id) == 0:
+        return jsonify({ '404' : 'Must provide a Trip ID for the rating' })
+    else if len(x) == 0 or len(y) == 0:
+        return jsonify({  '404' : 'Must provide x and y values' })
+    trip = models.Trip.query.filter(models.Trip.trip_id == trip_id, models.Trip.dataset_id == dataset_id).first()
+    if trip is None:
+        return jsonify({ '404' : 'Invalid Trip ID' })
+    datapoint = models.Datapoint(x = x, y = y, timestamp = timestamp, dataset_id = dataset_id, trip = trip)
+    db.session.add(datapoint)
+    db.session.commit()
+    return jsonify(datapoint.serialize()), 200  
 
 @app.route('/stop_times/<dataset_id>', methods=['GET'])
 def get_stop_times(dataset_id):
