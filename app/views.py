@@ -181,7 +181,11 @@ def get_shapes(dataset_id):
     else:
         trip = models.Trip.query.filter(models.Trip.trip_id == trip_id, models.Trip.dataset_id == dataset_id).first()
         if not trip is None:
-            shapes = models.Shape.query.filter(models.Shape.shape_id == trip.shape_id, models.Shape.dataset_id == dataset_id)
+            if dataset_id == 'UConn':
+                s_id = trip.route.route_id
+                shapes = models.Shape.query.filter(models.Shape.shape_id == s_id, models.Shape.dataset_id == dataset_id)
+            else:
+                shapes = models.Shape.query.filter(models.Shape.shape_id == trip.shape_id, models.Shape.dataset_id == dataset_id)
         else:
             return jsonify({ '404' : 'Invalid Trip ID' })
     return jsonify({ 'shapes' : [s.serialize() for s in shapes] })    
