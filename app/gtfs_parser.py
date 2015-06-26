@@ -45,6 +45,7 @@ def load_objects(file, name):
                 value = values[i].strip()
                 if name == "Agency" and key == "agency_id":
                     AGENCY_ID = " " + value
+                    print "setting new agency_id: " + value
                 if key in IDS:
                     value = value + AGENCY_ID
                 # handle special cases for setting relationships
@@ -117,6 +118,7 @@ def commit_objects(objects):
     db.session.commit()
 
 def load_agency():
+    print "loading agencies"
     try:
         agencies = load_objects(GTFS_PATH + "agency.txt", "Agency")
         commit_objects(agencies)
@@ -125,6 +127,7 @@ def load_agency():
         db.session.rollback()
         
 def load_stops():
+    print "loading stops"
     try:
         stops = load_objects(GTFS_PATH + "stops.txt", "Stop")
         commit_objects(stops)
@@ -133,6 +136,7 @@ def load_stops():
         db.session.rollback()
         
 def load_routes():
+    print "loading routes"
     try:
         routes = load_objects(GTFS_PATH + "routes.txt", "Route")
         commit_objects(routes)
@@ -141,6 +145,7 @@ def load_routes():
         db.session.rollback()
         
 def load_trips():
+    print "loading trips"
     try:
         trips = load_objects(GTFS_PATH + "trips.txt", "Trip")
         commit_objects(trips)
@@ -149,6 +154,7 @@ def load_trips():
         db.session.rollback()
         
 def load_stop_times():
+    print "loading stop_times"
     try:
         stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
         commit_objects(stop_times)
@@ -157,6 +163,7 @@ def load_stop_times():
         db.session.rollback()
         
 def load_calendar():
+    print "loading calendar"
     try:
         calendar = load_objects(GTFS_PATH + "calendar.txt", "Calendar")
         commit_objects(calendar)
@@ -165,6 +172,7 @@ def load_calendar():
         db.session.rollback()
         
 def load_calendar_dates():
+    print "loading calendar dates"
     try:
         calendar_dates = load_objects(GTFS_PATH + "calendar_dates.txt", "CalendarDate")
         commit_objects(calendar_dates)
@@ -173,6 +181,7 @@ def load_calendar_dates():
         db.session.rollback()
         
 def load_shapes():
+    print "loading shapes"
     try:
         shapes = load_objects(GTFS_PATH + "shapes.txt", "Shape")
         commit_objects(shapes)
@@ -182,7 +191,7 @@ def load_shapes():
 
 def load_all():
     # the order is important (necessary for relationships):
-    # agencies must be loaded before routes
+    # agencies must be loaded before routes (before everything else actually)
     load_agency()
     # routes must be loaded before trips and before shapes
     load_routes()
