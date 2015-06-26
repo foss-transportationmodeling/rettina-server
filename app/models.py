@@ -12,7 +12,6 @@ class Agency(db.Model):
     agency_phone = db.Column(db.String(32))
     agency_lang = db.Column(db.String(2))
     agency_fare_url = db.Column(db.String(256))
-    dataset_id = db.Column(db.String(32))
     def serialize(self):
         return {
             'agency_id' : self.agency_id,
@@ -27,7 +26,7 @@ class Agency(db.Model):
     
 class Stop(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    stop_id = db.Column(db.String(32), unique = True)
+    stop_id = db.Column(db.String(64), unique = True)
     stop_code = db.Column(db.String(16))
     stop_name = db.Column(db.String(128))
     stop_desc = db.Column(db.Text)
@@ -39,7 +38,6 @@ class Stop(db.Model):
     parent_station = db.Column(db.String(32))
     stop_timezone = db.Column(db.String(2))
     wheelchair_boarding = db.Column(db.Integer)
-    dataset_id = db.Column(db.String(32))
     def serialize(self):
         ats = None
         if not self.stop_times is None:
@@ -66,7 +64,7 @@ class Stop(db.Model):
     
 class Route(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    route_id = db.Column(db.String(32), unique = True)
+    route_id = db.Column(db.String(64), unique = True)
     route_short_name = db.Column(db.String(256))
     route_long_name = db.Column(db.String(512))
     route_desc = db.Column(db.Text)
@@ -76,7 +74,6 @@ class Route(db.Model):
     route_text_color = db.Column(db.String(6), default = "000000")
     agency_id = db.Column(db.Integer, db.ForeignKey('agency.id'))
     agency = db.relationship('Agency', backref = db.backref('routes', lazy = 'dynamic'))
-    dataset_id = db.Column(db.String(32))
     def serialize(self, valid_trips, n):
         a_name = None
         a_id = None
@@ -115,9 +112,9 @@ stops = db.Table('stops',
     
 class Trip(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    service_id = db.Column(db.String(32))
-    trip_id = db.Column(db.String(32), unique = True)
-    shape_id = db.Column(db.Integer)
+    service_id = db.Column(db.String(64))
+    trip_id = db.Column(db.String(64), unique = True)
+    shape_id = db.Column(db.String(64))
     trip_headsign = db.Column(db.String(32))
     trip_short_name = db.Column(db.String(64))
     direction_id = db.Column(db.Integer)
@@ -128,7 +125,6 @@ class Trip(db.Model):
         backref = db.backref('trips', lazy = 'dynamic'))
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
     route = db.relationship('Route', backref = db.backref('trips', lazy = 'dynamic'))
-    dataset_id = db.Column(db.String(32))
     def serialize(self):
         r_id = None
         if not self.route is None:
@@ -149,34 +145,41 @@ class Trip(db.Model):
             'datapoints' : [d.serialize() for d in self.datapoints]
         }
         
-class Comment(db.Model):
+class Experience(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref = db.backref('comments', lazy = 'dynamic'))
-    text = db.Column(db.Text)
-    dataset_id = db.Column(db.String(32))
+    trip = db.relationship('Trip', backref = db.backref('experiences', lazy = 'dynamic'))
+    experience_id = db.Column(db.String(64))
+    comment = db.Column(db.Text)
+    quality = db.Column(db.Float)
+    open_seats = db.Column(db.Integer)
     def serialize(self):
-        return { 'text' : self.text }
+        t_id = None
+        if not self.trip is None:
+            t_id = self.trip.trip_id
+        return {
+            'experience_id' : self.experience_id,
+            'trip_id' : t_id,
+            'comment' : self.comment,
+            'quality' : self.quality,
+            'open_seats' : self.open_seats
+        }
         
-class QualityRating(db.Model):
+class Location(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref = db.backref('ratings', lazy = 'dynamic'))
-    rating = db.Column(db.Float)
-    dataset_id = db.Column(db.String(32))
-    def serialize(self):
-        return { 'rating' : self.rating }
-        
-class Datapoint(db.Model):
-    id = db.Column(db.Integer, primary_key = True)
-    trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref = db.backref('datapoints', lazy = 'dynamic'))
+    trip = db.relationship('Trip', backref = db.backref('locations', lazy = 'dynamic'))
+    location_id = db.Column(db.String(64))
     x = db.Column(db.Float)
     y = db.Column(db.Float)
     timestamp = db.Column(db.DateTime)
-    dataset_id = db.Column(db.String(32))
     def serialize(self):
+        t_id = None
+        if not self.trip is None:
+            t_id = self.trip.trip_id
         return {
+            'location_id' : self.location_id,
+            'trip_id' : self.trip_id,
             'x' : self.x,
             'y' : self.y,
             'timestamp' : self.timestamp
@@ -198,7 +201,6 @@ class StopTime(db.Model):
     timepoint = db.Column(db.Integer)
     stop_lat = db.Column(db.Float)
     stop_lon = db.Column(db.Float)
-    dataset_id = db.Column(db.String(32))
     def serialize(self):
         s_id = None
         if not self.stop is None:
@@ -223,7 +225,7 @@ class StopTime(db.Model):
     
 class Calendar(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    service_id = db.Column(db.String(32))
+    service_id = db.Column(db.String(64))
     monday = db.Column(db.Integer)
     tuesday = db.Column(db.Integer)
     wednesday = db.Column(db.Integer)
@@ -233,7 +235,6 @@ class Calendar(db.Model):
     sunday = db.Column(db.Integer)
     start_date = db.Column(db.String(16))
     end_date = db.Column(db.String(16))
-    dataset_id = db.Column(db.String(32))
     def serialize(self):
         return {
             'service_id' : self.service_id,
@@ -250,10 +251,9 @@ class Calendar(db.Model):
     
 class CalendarDate(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    service_id = db.Column(db.String(32))
+    service_id = db.Column(db.String(64))
     date = db.Column(db.String(16))
     exception_type = db.Column(db.Integer)
-    dataset_id = db.Column(db.String(32))
     def serialize(self):
         return {
             'service_id' : self.service_id,
@@ -263,12 +263,11 @@ class CalendarDate(db.Model):
 
 class Shape(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    shape_id = db.Column(db.Integer)
+    shape_id = db.Column(db.String(64))
     shape_pt_lat = db.Column(db.Float)
     shape_pt_lon = db.Column(db.Float)
     shape_pt_sequence = db.Column(db.Integer)
     shape_dist_traveled = db.Column(db.Float)
-    dataset_id = db.Column(db.String(32))
     def serialize(self):
         return {
             'shape_id' : self.shape_id,

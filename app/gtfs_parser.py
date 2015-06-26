@@ -5,8 +5,7 @@ from pytz import utc
 from calendar import timegm
 
 GTFS_PATH = "tmp/GTFS/"
-
-dataset_id = ""
+IDS = ["stop_id", "route_id", "service_id", "trip_id", "shape_id"]
 
 def object_for_name(name):
     if name == "Agency":
@@ -28,11 +27,14 @@ def object_for_name(name):
     else:
         return None
         
+AGENCY_ID = ""
+        
 def load_objects(file, name):
     objects = []
     f = open(file, 'r')
     clean_first_line = f.readline().strip().replace(' ', '')
     keys = clean_first_line.split(',')
+    global AGENCY_ID
     try:
         for line in f:
             obj = object_for_name(name)
@@ -41,6 +43,10 @@ def load_objects(file, name):
                 continue
             for i, key in enumerate(keys):
                 value = values[i].strip()
+                if name == "Agency" and key == "agency_id":
+                    AGENCY_ID = " " + value
+                if key in IDS:
+                    value = value + AGENCY_ID
                 # handle special cases for setting relationships
                 if name == "StopTime" and key == "trip_id":
                     set_trip_for_stop_time(obj, value)
@@ -57,7 +63,6 @@ def load_objects(file, name):
                 else:
                     if hasattr(obj, key):
                         setattr(obj, key, value)
-            obj.dataset_id = dataset_id
             objects.append(obj)
     except IndexError:
         print "A value is missing from " + file
