@@ -45,7 +45,7 @@ def load_objects(file, name):
                 value = values[i].strip()
                 if name == "Agency" and key == "agency_name":
                     AGENCY_ID = " " + value
-                    print "setting new agency_id: " + value
+                    print "setting new agency_id:" + value
                 if key in IDS:
                     value = value + AGENCY_ID
                 # handle special cases for setting relationships

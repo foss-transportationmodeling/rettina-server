@@ -103,55 +103,41 @@ def get_trips():
     trips = models.Trip.query.all()
     return jsonify({ 'trips' : [t.serialize() for t in trips] })
     
-@app.route('/comments', methods=['POST'])
-def create_comment():
+@app.route('/experiences', methods=['POST'])
+def create_experience():
     trip_id = request.args.get('trip_id', '')
-    text = request.args.get('text', '')
+    comment = request.args.get('comment', '')
+    quality = request.args.get('quality', -1)
+    open_seats = request.args.get('open_seats', -1)
     if len(trip_id) == 0:
-        return jsonify({ '404' : 'Must provide a Trip ID for the comment' })
-    elif len(text) == 0:
-        return jsonify({  '404' : 'Must provide text for the comment' })
+        return jsonify({ '404' : 'Must provide a Trip ID for the experience' })
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
     if trip is None:
         return jsonify({ '404' : 'Invalid Trip ID' })
-    comment = models.Comment(text = text, trip = trip)
-    db.session.add(comment)
+    experience = models.Experience(comment = comment, quality = quality, open_seats = open_seats, trip = trip)
+    experience.experience_id = str(experience.id)
+    db.session.add(experience)
     db.session.commit()
-    return jsonify(comment.serialize()), 200
-
-@app.route('/ratings', methods=['POST'])
-def create_quality_rating():
-    trip_id = request.args.get('trip_id', '')
-    rating = request.args.get('rating', '')
-    if len(trip_id) == 0:
-        return jsonify({ '404' : 'Must provide a Trip ID for the rating' })
-    elif len(rating) == 0:
-        return jsonify({  '404' : 'Must provide a rating value' })
-    trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
-    if trip is None:
-        return jsonify({ '404' : 'Invalid Trip ID' })
-    quality_rating = models.QualityRating(rating = rating, trip = trip)
-    db.session.add(quality_rating)
-    db.session.commit()
-    return jsonify(quality_rating.serialize()), 200
+    return jsonify(experience.serialize()), 200
     
-@app.route('/datapoints', methods=['POST'])
-def create_datapoint():
+@app.route('/locations', methods=['POST'])
+def create_location():
     trip_id = request.args.get('trip_id', '')
     x = request.args.get('x', '')
     y = request.args.get('y', '')
     timestamp = datetime.utcnow()
     if len(trip_id) == 0:
-        return jsonify({ '404' : 'Must provide a Trip ID for the datapoint' })
+        return jsonify({ '404' : 'Must provide a Trip ID for the location' })
     elif len(x) == 0 or len(y) == 0:
         return jsonify({  '404' : 'Must provide x and y values' })
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
     if trip is None:
         return jsonify({ '404' : 'Invalid Trip ID' })
-    datapoint = models.Datapoint(x = x, y = y, timestamp = timestamp, trip = trip)
-    db.session.add(datapoint)
+    location = models.Location(x = x, y = y, timestamp = timestamp, trip = trip)
+    location.location_id = str(location.id)
+    db.session.add(location)
     db.session.commit()
-    return jsonify(datapoint.serialize()), 200  
+    return jsonify(location.serialize()), 200  
 
 @app.route('/stop_times', methods=['GET'])
 def get_stop_times():
