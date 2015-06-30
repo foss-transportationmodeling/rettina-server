@@ -8,6 +8,9 @@ from app import app, db, models
 from sets import Set
 from datetime import datetime
 
+def decode(url):
+    return urllib.unquote(url).decode('utf8')
+
 @app.route('/agency', methods=['GET'])
 def get_agency():
     agencies = models.Agency.query.all()
@@ -105,7 +108,7 @@ def get_trips():
     
 @app.route('/experiences', methods=['POST'])
 def create_experience():
-    trip_id = request.args.get('trip_id', '')
+    trip_id = decode(request.args.get('trip_id', ''))
     comment = request.args.get('comment', '')
     quality = request.args.get('quality', -1)
     open_seats = request.args.get('open_seats', -1)
@@ -122,7 +125,7 @@ def create_experience():
     
 @app.route('/locations', methods=['POST'])
 def create_location():
-    trip_id = request.args.get('trip_id', '')
+    trip_id = decode(request.args.get('trip_id', ''))
     x = request.args.get('x', '')
     y = request.args.get('y', '')
     timestamp = datetime.utcnow()
