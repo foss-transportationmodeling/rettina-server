@@ -19,7 +19,7 @@ def get_agency():
 @app.route('/stops', methods=['GET'])
 def get_stops():
     stops = None
-    trip_id = request.args.get('trip_id', '')
+    trip_id = decode(request.args.get('trip_id', ''))
     if len(trip_id) == 0:
         stops = models.Stop.query.all()
     else:
@@ -50,8 +50,8 @@ def get_routes():
             return jsonify({ '404' : 'Bad URL Parameters'}), 404
         else:
             stop_times = []
-            start = request.args.get('start', '')
-            stop = request.args.get('stop', '')
+            start = decode(request.args.get('start', ''))
+            stop = decode(request.args.get('stop', ''))
             
             if len(stop) > 0 and len(start) == 0:
                 # the parameters provided cannot be used to filter, so return error
@@ -109,7 +109,7 @@ def get_trips():
 @app.route('/experiences', methods=['POST'])
 def create_experience():
     trip_id = decode(request.args.get('trip_id', ''))
-    comment = request.args.get('comment', '')
+    comment = decode(request.args.get('comment', ''))
     quality = request.args.get('quality', -1)
     open_seats = request.args.get('open_seats', -1)
     if len(trip_id) == 0:
@@ -160,13 +160,13 @@ def get_calendar_dates():
 @app.route('/shapes', methods=['GET'])
 def get_shapes():
     shapes = None
-    trip_id = request.args.get('trip_id', '')
+    trip_id = decode(request.args.get('trip_id', ''))
     if len(trip_id) == 0:
         shapes = models.Shape.query.all()
     else:
         trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
         if not trip is None:
-            if dataset_id == 'UConn':
+            if 'UConn' in trip.trip_id:
                 s_id = trip.route.route_id
                 shapes = models.Shape.query.filter(models.Shape.shape_id == s_id)
             else:
@@ -193,6 +193,8 @@ def delete_all_records():
     s = models.Stop.query.delete()
     t = models.Trip.query.delete()
     sh = models.Shape.query.delete()
+    ex = models.Experience.query.delete()
+    loc = models.Location.query.delete()
     db.session.commit()
     
 @app.errorhandler(400)
