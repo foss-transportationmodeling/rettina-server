@@ -178,7 +178,7 @@ class Location(db.Model):
             t_id = self.trip.trip_id
         return {
             'location_id' : self.location_id,
-            'trip_id' : self.trip_id,
+            'trip_id' : t_id,
             'x' : self.x,
             'y' : self.y,
             'timestamp' : self.timestamp
