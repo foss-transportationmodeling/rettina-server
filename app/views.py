@@ -118,7 +118,9 @@ def create_experience():
     if trip is None:
         return jsonify({ '404' : 'Invalid Trip ID' })
     experience = models.Experience(comment = comment, quality = quality, open_seats = open_seats, trip = trip)
-    experience.experience_id = str(experience.id)
+    db.session.add(experience)
+    db.session.commit()
+    experience.experience_id = str(experience.id) # the object's ID isn't set until it is added to the DB
     db.session.add(experience)
     db.session.commit()
     return jsonify(experience.serialize()), 200
@@ -137,7 +139,9 @@ def create_location():
     if trip is None:
         return jsonify({ '404' : 'Invalid Trip ID' })
     location = models.Location(x = x, y = y, timestamp = timestamp, trip = trip)
-    location.location_id = str(location.id)
+    db.session.add(location)
+    db.session.commit()
+    location.location_id = str(location.id) # the object's ID isn't set until it is added to the DB
     db.session.add(location)
     db.session.commit()
     return jsonify(location.serialize()), 200  
