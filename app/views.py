@@ -106,6 +106,27 @@ def get_trips():
     trips = models.Trip.query.all()
     return jsonify({ 'trips' : [t.serialize() for t in trips] })
     
+@app.route('/experiences', methods=['GET'])
+def get_experiences():
+    experiences = None
+    trip_id = decode(request.args.get('trip_id', ''))
+    route_id = decode(request.args.get('route_id', ''))
+    if len(trip_id) == 0 and len(route_id) == 0:
+        experiences = models.Experience.query.all()
+    elif len(route_id) == 0:
+        # only trip_id provided
+        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
+        if trip is None:
+            return jsonify({ '404' : 'Invalid Trip ID' })
+        experiences = models.Experience.query.filter(models.Experience.trip == trip)
+    else:
+        # route_id provided (will take precedence over trip_id if both are provided)
+        route = models.Route.query.filter(models.Route.route_id == route_id).first()
+        if route is None:
+            return jsonify({ '404' : 'Invalid Route ID' })
+        experiences = models.Experience.query.filter(models.Experience.route == route)
+    return jsonify({ 'experiences' : [e.serialize() for e in experiences] })
+    
 @app.route('/experiences', methods=['POST'])
 def create_experience():
     trip_id = decode(request.args.get('trip_id', ''))
@@ -117,13 +138,34 @@ def create_experience():
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
     if trip is None:
         return jsonify({ '404' : 'Invalid Trip ID' })
-    experience = models.Experience(comment = comment, quality = quality, open_seats = open_seats, trip = trip)
+    experience = models.Experience(comment = comment, quality = quality, open_seats = open_seats, trip = trip, route = trip.route)
     db.session.add(experience)
     db.session.commit()
     experience.experience_id = str(experience.id) # the object's ID isn't set until it is added to the DB
     db.session.add(experience)
     db.session.commit()
     return jsonify(experience.serialize()), 200
+    
+@app.route('/locations', methods=['GET'])
+def get_locations():
+    locations = None
+    trip_id = decode(request.args.get('trip_id', ''))
+    route_id = decode(request.args.get('route_id', ''))
+    if len(trip_id) == 0 and len(route_id) == 0:
+        locations = models.Location.query.all()
+    elif len(route_id) == 0:
+        # only trip_id provided
+        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
+        if trip is None:
+            return jsonify({ '404' : 'Invalid Trip ID' })
+        locations = models.Location.query.filter(models.Location.trip == trip)
+    else:
+        # route_id provided (will take precedence over trip_id if both are provided)
+        route = models.Route.query.filter(models.Route.route_id == route_id).first()
+        if route is None:
+            return jsonify({ '404' : 'Invalid Route ID' })
+        locations = models.Location.query.filter(models.Location.route == route)
+    return jsonify({ 'locations' : [l.serialize() for l in locations] })
     
 @app.route('/locations', methods=['POST'])
 def create_location():
@@ -138,7 +180,7 @@ def create_location():
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
     if trip is None:
         return jsonify({ '404' : 'Invalid Trip ID' })
-    location = models.Location(x = x, y = y, timestamp = timestamp, trip = trip)
+    location = models.Location(x = x, y = y, timestamp = timestamp, trip = trip, route = trip.route)
     db.session.add(location)
     db.session.commit()
     location.location_id = str(location.id) # the object's ID isn't set until it is added to the DB

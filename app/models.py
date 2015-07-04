@@ -148,6 +148,8 @@ class Experience(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref = db.backref('experiences', lazy = 'dynamic'))
+    route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
+    route = db.relationship('Route', backref = db.backref('experiences', lazy = 'dynamic'))
     experience_id = db.Column(db.String(64))
     comment = db.Column(db.Text)
     quality = db.Column(db.Float)
@@ -156,9 +158,13 @@ class Experience(db.Model):
         t_id = None
         if not self.trip is None:
             t_id = self.trip.trip_id
+        r_id = None
+        if not self.route is None:
+            r_id = self.route.route_id
         return {
             'experience_id' : self.experience_id,
             'trip_id' : t_id,
+            'route_id' : r_id,
             'comment' : self.comment,
             'quality' : self.quality,
             'open_seats' : self.open_seats
@@ -168,6 +174,8 @@ class Location(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref = db.backref('locations', lazy = 'dynamic'))
+    route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
+    route = db.relationship('Route', backref = db.backref('experiences', lazy = 'dynamic'))
     location_id = db.Column(db.String(64))
     x = db.Column(db.Float)
     y = db.Column(db.Float)
@@ -176,9 +184,13 @@ class Location(db.Model):
         t_id = None
         if not self.trip is None:
             t_id = self.trip.trip_id
+        r_id = None
+        if not self.route is None:
+            r_id = self.route.route_id
         return {
             'location_id' : self.location_id,
             'trip_id' : t_id,
+            'route_id' : r_id,
             'x' : self.x,
             'y' : self.y,
             'timestamp' : self.timestamp
