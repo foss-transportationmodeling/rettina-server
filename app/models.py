@@ -175,7 +175,7 @@ class Location(db.Model):
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
     trip = db.relationship('Trip', backref = db.backref('locations', lazy = 'dynamic'))
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
-    route = db.relationship('Route', backref = db.backref('experiences', lazy = 'dynamic'))
+    route = db.relationship('Route', backref = db.backref('locations', lazy = 'dynamic'))
     location_id = db.Column(db.String(64))
     x = db.Column(db.Float)
     y = db.Column(db.Float)
