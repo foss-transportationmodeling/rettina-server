@@ -169,6 +169,7 @@ def get_locations():
     
 @app.route('/locations', methods=['POST'])
 def create_location():
+'''
     trip_id = decode(request.args.get('trip_id', ''))
     x = request.args.get('x', '')
     y = request.args.get('y', '')
@@ -187,7 +188,12 @@ def create_location():
     db.session.add(location)
     db.session.commit()
     return jsonify(location.serialize()), 200  
-
+'''
+    json = request.get_json()
+    print json['cheese']
+    print json['pizza']
+    return jsonify({})
+    
 @app.route('/stop_times', methods=['GET'])
 def get_stop_times():
     stop_times = models.StopTime.query.all()
