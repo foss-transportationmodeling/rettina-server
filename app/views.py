@@ -168,31 +168,40 @@ def get_locations():
     return jsonify({ 'locations' : [l.serialize() for l in locations] })
     
 @app.route('/locations', methods=['POST'])
-def create_location():
-'''
-    trip_id = decode(request.args.get('trip_id', ''))
-    x = request.args.get('x', '')
-    y = request.args.get('y', '')
-    timestamp = datetime.utcnow()
-    if len(trip_id) == 0:
-        return jsonify({ '404' : 'Must provide a Trip ID for the location' })
-    elif len(x) == 0 or len(y) == 0:
-        return jsonify({  '404' : 'Must provide x and y values' })
+def create_locations():
+    locations = []
+    
+    json = request.get_json()
+    if json is None:
+        return jsonify({ '404' : 'Unable to parse JSON. Did you specify a content type of \'application/json\'?' })
+        
+    trip_id = None
+    try:
+        trip_id = json['trip_id']
+    except KeyError:
+        return jsonify({ '404' : 'Must provide a Trip ID' })
     trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
     if trip is None:
         return jsonify({ '404' : 'Invalid Trip ID' })
-    location = models.Location(x = x, y = y, timestamp = timestamp, trip = trip, route = trip.route)
-    db.session.add(location)
+        
+    locs = None
+    try:
+        locs = json['locations']
+    except KeyError:
+        return jsonify({ '404' : 'Must provide locations' })
+    for loc in locs:
+        try:
+            l = models.Location(x = loc['x'], y = loc['y'], timestamp = datetime.utcnow(), trip = trip, route = trip.route)
+            db.session.add(l)
+            locations.append(l)
+        except KeyError:
+            return jsonify({ '404' : 'An x or y value is missing from one of the locations' })
     db.session.commit()
-    location.location_id = str(location.id) # the object's ID isn't set until it is added to the DB
-    db.session.add(location)
+    for l in locations:
+        l.location_id = str(l.id) # the object's ID isn't set until it is added to the DB
+        db.session.add(l)
     db.session.commit()
-    return jsonify(location.serialize()), 200  
-'''
-    json = request.get_json()
-    print json['cheese']
-    print json['pizza']
-    return jsonify({})
+    return jsonify({ 'locations' : [l.serialize() for l in locations] }), 200
     
 @app.route('/stop_times', methods=['GET'])
 def get_stop_times():
