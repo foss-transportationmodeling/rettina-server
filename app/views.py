@@ -191,7 +191,8 @@ def create_locations():
         return jsonify({ '404' : 'Must provide locations' })
     for loc in locs:
         try:
-            l = models.Location(x = loc['x'], y = loc['y'], timestamp = datetime.utcnow(), trip = trip, route = trip.route)
+            stamp = datetime.strptime(loc['timestamp'], '%b %d %Y %I:%M%S%p')
+            l = models.Location(x = loc['x'], y = loc['y'], timestamp = stamp, trip = trip, route = trip.route)
             db.session.add(l)
             locations.append(l)
         except KeyError:
