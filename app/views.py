@@ -191,12 +191,12 @@ def create_locations():
         return jsonify({ '404' : 'Must provide locations' })
     for loc in locs:
         try:
-            stamp = datetime.strptime(loc['timestamp'], '%b %d %Y %I:%M%S%p')
+            stamp = datetime.strptime(loc['timestamp'], '%b %d %Y %I:%M:%S%p')
             l = models.Location(x = loc['x'], y = loc['y'], timestamp = stamp, trip = trip, route = trip.route)
             db.session.add(l)
             locations.append(l)
         except KeyError:
-            return jsonify({ '404' : 'An x or y value is missing from one of the locations' })
+            return jsonify({ '404' : 'You must provide a timestamp and an x and y value for all locations' })
     db.session.commit()
     for l in locations:
         l.location_id = str(l.id) # the object's ID isn't set until it is added to the DB
