@@ -2,7 +2,7 @@
 mySQL db?!?
 '''
 
-import urllib, zipfile, os, shutil, gtfs_parser, glob
+import urllib, zipfile, os, shutil, gtfs_parser, glob, uuid
 from flask import jsonify, request
 from app import app, db, models
 from sets import Set
@@ -189,10 +189,16 @@ def create_locations():
         locs = json['locations']
     except KeyError:
         return jsonify({ '404' : 'Must provide locations' })
+    grouping_id = uuid.uuid4()
     for loc in locs:
         try:
-            stamp = datetime.strptime(loc['timestamp'], '%b %d %Y %I:%M:%S%p')
-            l = models.Location(x = loc['x'], y = loc['y'], timestamp = stamp, trip = trip, route = trip.route)
+            stamp = None
+            try:
+                stamp = datetime.strptime(loc['timestamp'], '%b %d %Y %I:%M:%S%p')
+            except ValueError:
+                return jsonify({ '404' : 'Invalid time format' })
+            l = models.Location(x = loc['x'], y = loc['y'], timestamp = stamp, grouping_id = grouping_id,
+            location_technology = loc['location_technology'], trip = trip, route = trip.route)
             db.session.add(l)
             locations.append(l)
         except KeyError:

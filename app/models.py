@@ -139,9 +139,7 @@ class Trip(db.Model):
             'block_id' : self.block_id,
             'shape_id' : self.shape_id,
             'wheelchair_accessible' : self.wheelchair_accessible,
-            'bikes_allowed' : self.bikes_allowed,
-            'experiences' : [e.serialize() for e in self.experiences],
-            'locations' : [l.serialize() for l in self.locations]
+            'bikes_allowed' : self.bikes_allowed
         }
         
 class Experience(db.Model):
@@ -177,9 +175,11 @@ class Location(db.Model):
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
     route = db.relationship('Route', backref = db.backref('locations', lazy = 'dynamic'))
     location_id = db.Column(db.String(64))
+    grouping_id = db.Column(db.String(64))
     x = db.Column(db.Float)
     y = db.Column(db.Float)
     timestamp = db.Column(db.DateTime)
+    location_technology = db.Column(db.String(64))
     def serialize(self):
         t_id = None
         if not self.trip is None:
@@ -191,9 +191,11 @@ class Location(db.Model):
             'location_id' : self.location_id,
             'trip_id' : t_id,
             'route_id' : r_id,
+            'grouping_id' : self.grouping_id,
             'x' : self.x,
             'y' : self.y,
-            'timestamp' : self.timestamp
+            'timestamp' : self.timestamp,
+            'location_technology' : self.location_technology
         }
     
 class StopTime(db.Model):
