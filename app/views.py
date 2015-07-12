@@ -1,6 +1,3 @@
-'''
-mySQL db?!?
-'''
 
 import urllib, zipfile, os, shutil, gtfs_parser, glob, uuid
 from flask import jsonify, request
@@ -273,7 +270,7 @@ def bad_request(error):
 def not_found_error(error):
     return jsonify({ '404' : 'Not Found Error' }), 404 
     
-@app.errorhandler(500)
-def internal_error(error):
-    db.session.rollback()
-    return jsonify({ '500' : 'Internal Server Error' }), 500
+#@app.errorhandler(500)
+#def internal_error(error):
+#    db.session.rollback()
+#    return jsonify({ '500' : 'Internal Server Error' }), 500
