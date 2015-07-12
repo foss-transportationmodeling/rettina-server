@@ -186,7 +186,7 @@ def create_locations():
         locs = json['locations']
     except KeyError:
         return jsonify({ '404' : 'Must provide locations' })
-    grouping_id = uuid.uuid4()
+    grouping_id = str(uuid.uuid4())
     for loc in locs:
         try:
             stamp = None
@@ -270,7 +270,7 @@ def bad_request(error):
 def not_found_error(error):
     return jsonify({ '404' : 'Not Found Error' }), 404 
     
-#@app.errorhandler(500)
-#def internal_error(error):
-#    db.session.rollback()
-#    return jsonify({ '500' : 'Internal Server Error' }), 500
+@app.errorhandler(500)
+def internal_error(error):
+    db.session.rollback()
+    return jsonify({ '500' : 'Internal Server Error' }), 500
