@@ -1,8 +1,8 @@
-import requests
+import urllib, json
 
 url = 'localhost:5000/locations'
 
-payload = {
+data = {
 	'trip_id' : '1 UConn Transportation Service',
 	'locations' :
 	[
@@ -27,8 +27,9 @@ payload = {
 	]
 }
 
-headers = { 'Content-Type' : 'application/json' }
+req = urllib2.Request(url)
+req.add_header('Content-Type', 'application/json')
 
-response = requests.post(url, data = payload, headers = headers)
+response = urllib2.urlopen(req, json.dumps(data))
 
 print response
