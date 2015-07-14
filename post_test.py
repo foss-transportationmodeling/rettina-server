@@ -1,6 +1,6 @@
-import urllib, json
+import urllib2, json
 
-url = 'localhost:5000/locations'
+url = 'http://137.99.15.144/locations'
 
 data = {
 	'trip_id' : '1 UConn Transportation Service',
