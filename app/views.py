@@ -136,15 +136,14 @@ def create_experience():
     if trip is None:
         return jsonify({ '404' : 'Invalid Trip ID' })
     experience = models.Experience(comment = comment, quality = quality, open_seats = open_seats, trip = trip, route = trip.route)
-    db.session.add(experience)
     try:
+        db.session.add(experience)
+        experience.experience_id = str(experience.id) # the object's ID isn't set until it is added to the DB
+        db.session.add(experience)
         db.session.commit()
+        return jsonify(experience.serialize()), 200
     except Exception, e:
         return jsonify({ 'Error' : e.description })
-    experience.experience_id = str(experience.id) # the object's ID isn't set until it is added to the DB
-    db.session.add(experience)
-    db.session.commit()
-    return jsonify(experience.serialize()), 200
     
 @app.route('/locations', methods=['GET'])
 def get_locations():
