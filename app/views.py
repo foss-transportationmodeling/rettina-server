@@ -138,6 +138,7 @@ def create_experience():
     experience = models.Experience(comment = comment, quality = quality, open_seats = open_seats, trip = trip, route = trip.route)
     try:
         db.session.add(experience)
+        db.session.commit()
         experience.experience_id = str(experience.id) # the object's ID isn't set until it is added to the DB
         db.session.add(experience)
         db.session.commit()
