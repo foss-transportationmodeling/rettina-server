@@ -148,7 +148,10 @@ def get_locations():
     locations = None
     trip_id = decode(request.args.get('trip_id', ''))
     route_id = decode(request.args.get('route_id', ''))
-    if len(trip_id) == 0 and len(route_id) == 0:
+    grouping_id = decode(request.args.get('grouping_id', ''))
+    if len(grouping_id) > 0:
+        locations = models.Location.query.filter(models.Location.grouping_id == grouping_id)
+    elif len(trip_id) == 0 and len(route_id) == 0:
         locations = models.Location.query.all()
     elif len(route_id) == 0:
         # only trip_id provided
