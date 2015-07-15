@@ -136,7 +136,6 @@ def create_experience():
     if trip is None:
         return jsonify({ '404' : 'Invalid Trip ID' })
     experience = models.Experience(comment = comment, quality = quality, open_seats = open_seats, trip = trip, route = trip.route)
-    return jsonify({ 'Made it...' : 'to here' })
     db.session.add(experience)
     db.session.commit()
     experience.experience_id = str(experience.id) # the object's ID isn't set until it is added to the DB
