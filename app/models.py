@@ -115,10 +115,10 @@ class Trip(db.Model):
     service_id = db.Column(db.String(64))
     trip_id = db.Column(db.String(64), unique = True)
     shape_id = db.Column(db.String(64))
-    trip_headsign = db.Column(db.String(32))
+    trip_headsign = db.Column(db.String(64))
     trip_short_name = db.Column(db.String(64))
     direction_id = db.Column(db.Integer)
-    block_id = db.Column(db.Integer)
+    block_id = db.Column(db.String(32))
     wheelchair_accessible = db.Column(db.Integer)
     bikes_allowed = db.Column(db.Integer)
     stops = db.relationship('Stop', secondary = stops, 
