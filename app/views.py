@@ -213,7 +213,15 @@ def create_locations():
     
 @app.route('/stop_times', methods=['GET'])
 def get_stop_times():
-    stop_times = models.StopTime.query.all()
+    stop_times = None
+    trip_id = decode(request.args.get('trip_id', ''))
+    if len(trip_id) > 0:
+        trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
+        if trip is None:
+            return jsonify({ '404' : 'Invalid Trip ID' })
+        stop_times = models.StopTime.query.filter(models.StopTime.trip == trip)
+    else:
+        stop_times = models.StopTime.query.all()
     return jsonify({ 'stop_times' : [st.serialize() for st in stop_times] })
 
 @app.route('/calendar', methods=['GET'])
