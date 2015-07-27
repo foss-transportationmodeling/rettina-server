@@ -12,7 +12,7 @@ class MyThread (threading.Thread):
     def run(self):
         print "Starting " + self.name
         # Get lock to synchronize threads
-        self.threadLock.acquire()
+        self.thread_lock.acquire()
         # Do the dirty work
         try:
             objects = gtfs_parser.load_objects(gtfs_parser.GTFS_PATH + self.file_name, self.object_name)
@@ -21,4 +21,4 @@ class MyThread (threading.Thread):
             print "Error in loading " + self.file_name
             db.session.rollback()
         # Free lock to release next thread
-        self.threadLock.release()
+        self.thread_lock.release()
