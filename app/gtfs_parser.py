@@ -4,6 +4,9 @@ from datetime import datetime
 from pytz import utc
 from calendar import timegm
 
+from threads import MyThread
+import threading
+
 GTFS_PATH = "tmp/GTFS/"
 IDS = ["stop_id", "route_id", "service_id", "trip_id", "shape_id"]
 
@@ -190,18 +193,33 @@ def load_shapes():
         db.session.rollback()
 
 def load_all():
+    threadLock = threading.Lock()
+    threads = [
+        MyThread("agency thread", "agency.txt", "Agency", threadLock),
+        MyThread("routes thread", "routes.txt", "Route", threadLock),
+        MyThread("trips thread", "trips.txt", "Trip", threadLock),
+        MyThread("stops thread", "stops.txt", "Stop", threadLock),
+        MyThread("stop_times thread", "stop_times.txt", "StopTime", threadLock),
+        MyThread("calendar thread", "calendar.txt", "Calendar", threadLock),
+        MyThread("calendar_dates thread", "calendar_dates.txt", "CalendarDate", threadLock),
+        MyThread("shapes thread", "shapes.txt", "Shape", threadLock)
+    ]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
     # the order is important (necessary for relationships):
     # agencies must be loaded before routes (before everything else actually)
-    load_agency()
+    #load_agency()
     # routes must be loaded before trips and before shapes
-    load_routes()
+    #load_routes()
     # trips must be loaded before stop_times
-    load_trips()
+    #load_trips()
     # stops must be loaded before stop_times 
-    load_stops()
-    load_stop_times()
-    load_calendar()
-    load_calendar_dates()
-    load_shapes()
+    #load_stops()
+    #load_stop_times()
+    #load_calendar()
+    #load_calendar_dates()
+    #load_shapes()
 
 
