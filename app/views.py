@@ -255,6 +255,7 @@ def private_method():
         zfile.extractall('tmp/GTFS/')
         gtfs_parser.load_all()
         shutil.rmtree('tmp/GTFS')
+    print "DATA LOADED"
 def delete_all_records():
     a = models.Agency.query.delete()
     cd = models.CalendarDate.query.delete()
