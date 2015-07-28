@@ -4,7 +4,7 @@ from flask import jsonify, request
 from app import app, db, models
 from sets import Set
 from datetime import datetime
-import thread
+#import thread
 
 def decode(url):
     return urllib.unquote(url).decode('utf8')
@@ -254,28 +254,17 @@ def get_shapes():
 
 @app.route('/load_gtfs', methods=['GET'])
 def load_gtfs():
-    thread.start_new_thread(private_method, ())
-    return jsonify({ '200' : 'Data Loading' })
+    #thread.start_new_thread(private_method, ())
+    #return jsonify({ '200' : 'Data Loading' })
+    private_method()
+    return jsonify({ '200' : 'Data Loaded' })
 def private_method():
-    delete_all_records()
     for file in glob.glob('*.zip'):
         zfile = zipfile.ZipFile(file)
         zfile.extractall('tmp/GTFS/')
         gtfs_parser.load_all()
         shutil.rmtree('tmp/GTFS')
     print "DATA LOADED"
-def delete_all_records():
-    a = models.Agency.query.delete()
-    cd = models.CalendarDate.query.delete()
-    c = models.Calendar.query.delete()
-    r = models.Route.query.delete()
-    st = models.StopTime.query.delete()
-    s = models.Stop.query.delete()
-    t = models.Trip.query.delete()
-    sh = models.Shape.query.delete()
-    ex = models.Experience.query.delete()
-    loc = models.Location.query.delete()
-    db.session.commit()
     
 @app.errorhandler(400)
 def bad_request(error):
