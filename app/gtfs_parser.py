@@ -4,10 +4,8 @@ from datetime import datetime
 from pytz import utc
 from calendar import timegm
 
-#from threads import MyThread
-#import threading
+import thread
 
-GTFS_PATH = "tmp/GTFS/"
 IDS = ["stop_id", "route_id", "service_id", "trip_id", "shape_id"]
 
 def object_for_name(name):
@@ -32,12 +30,14 @@ def object_for_name(name):
         
 AGENCY_ID = ""
         
-def load_objects(file, name):
+def load_objects(file, name, agency_id = None):
     objects = []
     f = open(file, 'r')
     clean_first_line = f.readline().strip().replace(' ', '')
     keys = clean_first_line.split(',')
     global AGENCY_ID
+    if not agency_id is None:
+        AGENCY_ID = agency_id
     try:
         for line in f:
             obj = object_for_name(name)
@@ -120,106 +120,93 @@ def commit_objects(objects):
         db.session.add(obj)
     db.session.commit()
 
-def load_agency():
+def load_agency(gtfs_path):
     print "loading agencies"
     try:
-        agencies = load_objects(GTFS_PATH + "agency.txt", "Agency")
+        agencies = load_objects(gtfs_path + "agency.txt", "Agency")
         commit_objects(agencies)
     except:
         print "Error in loading agency.txt"
         db.session.rollback()
         
-def load_stops():
+def load_stops(gtfs_path):
     print "loading stops"
     try:
-        stops = load_objects(GTFS_PATH + "stops.txt", "Stop")
+        stops = load_objects(gtfs_path + "stops.txt", "Stop")
         commit_objects(stops)
     except:
         print "Error in loading stops.txt"
         db.session.rollback()
         
-def load_routes():
+def load_routes(gtfs_path):
     print "loading routes"
     try:
-        routes = load_objects(GTFS_PATH + "routes.txt", "Route")
+        routes = load_objects(gtfs_path + "routes.txt", "Route")
         commit_objects(routes)
     except:
         print "Error in loading routes.txt"
         db.session.rollback()
         
-def load_trips():
+def load_trips(gtfs_path):
     print "loading trips"
     try:
-        trips = load_objects(GTFS_PATH + "trips.txt", "Trip")
+        trips = load_objects(gtfs_path + "trips.txt", "Trip")
         commit_objects(trips)
     except:
         print "Error in loading trips.txt"
         db.session.rollback()
         
-def load_stop_times():
+def load_stop_times(gtfs_path):
     print "loading stop_times"
     try:
-        stop_times = load_objects(GTFS_PATH + "stop_times.txt", "StopTime")
+        stop_times = load_objects(gtfs_path + "stop_times.txt", "StopTime", AGENCY_ID)
         commit_objects(stop_times)
+        print "loaded stop_times"
     except:
         print "Error in loading stop_times.txt"
         db.session.rollback()
         
-def load_calendar():
+def load_calendar(gtfs_path):
     print "loading calendar"
     try:
-        calendar = load_objects(GTFS_PATH + "calendar.txt", "Calendar")
+        calendar = load_objects(gtfs_path + "calendar.txt", "Calendar")
         commit_objects(calendar)
     except:
         print "Error in loading calendar.txt"
         db.session.rollback()
         
-def load_calendar_dates():
+def load_calendar_dates(gtfs_path):
     print "loading calendar dates"
     try:
-        calendar_dates = load_objects(GTFS_PATH + "calendar_dates.txt", "CalendarDate")
+        calendar_dates = load_objects(gtfs_path + "calendar_dates.txt", "CalendarDate")
         commit_objects(calendar_dates)
     except:
         print "Error in loading calendar_dates.txt"
         db.session.rollback()
         
-def load_shapes():
+def load_shapes(gtfs_path):
     print "loading shapes"
     try:
-        shapes = load_objects(GTFS_PATH + "shapes.txt", "Shape")
+        shapes = load_objects(gtfs_path + "shapes.txt", "Shape", AGENCY_ID)
         commit_objects(shapes)
+        print "loaded shapes"
     except:
         print "Error in loading shapes.txt"
         db.session.rollback()
 
-def load_all():
-    #threadLock = threading.Lock()
-    #threads = [
-       # MyThread("agency thread", "agency.txt", "Agency", threadLock),
-        #MyThread("routes thread", "routes.txt", "Route", threadLock),
-        #MyThread("trips thread", "trips.txt", "Trip", threadLock),
-        #MyThread("stops thread", "stops.txt", "Stop", threadLock),
-       # MyThread("stop_times thread", "stop_times.txt", "StopTime", threadLock),
-       # MyThread("calendar thread", "calendar.txt", "Calendar", threadLock),
-      #  MyThread("calendar_dates thread", "calendar_dates.txt", "CalendarDate", threadLock),
-      #  MyThread("shapes thread", "shapes.txt", "Shape", threadLock)
-   # ]
-   # for t in threads:
-   #     t.start()
-   # for t in threads:
-   #     t.join()
+def load_all(gtfs_path):
     # the order is important (necessary for relationships):
     # agencies must be loaded before routes (before everything else actually)
-    load_agency()
+    load_agency(gtfs_path)
     # routes must be loaded before trips and before shapes
-    load_routes()
+    load_routes(gtfs_path)
     # trips must be loaded before stop_times
-    load_trips()
+    load_trips(gtfs_path)
     # stops must be loaded before stop_times 
-    load_stops()
-    load_stop_times()
-    load_calendar()
-    load_calendar_dates()
-    load_shapes()
+    load_stops(gtfs_path)
+    load_calendar(gtfs_path)
+    load_calendar_dates(gtfs_path)
+    thread.start_new_thread(load_shapes, (gtfs_path))
+    thread.start_new_thread(load_stop_times, (gtfs_path))
 
 
