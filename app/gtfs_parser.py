@@ -122,12 +122,12 @@ def commit_objects(objects):
 
 def load_agency(gtfs_path):
     print "loading agencies"
-    try:
-        agencies = load_objects(gtfs_path + "agency.txt", "Agency")
-        commit_objects(agencies)
-    except:
-        print "Error in loading agency.txt"
-        db.session.rollback()
+    #try:
+    agencies = load_objects(gtfs_path + "agency.txt", "Agency")
+    commit_objects(agencies)
+    #except:
+        #print "Error in loading agency.txt"
+        #db.session.rollback()
         
 def load_stops(gtfs_path):
     print "loading stops"
