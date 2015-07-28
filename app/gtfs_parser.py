@@ -28,7 +28,7 @@ def object_for_name(name):
     else:
         return None
                 
-def load_objects(file, name, agency_id = ""):
+def load_objects(file, name, agency_name = ""):
     objects = []
     f = open(file, 'r')
     clean_first_line = f.readline().strip().replace(' ', '')
@@ -42,7 +42,7 @@ def load_objects(file, name, agency_id = ""):
             for i, key in enumerate(keys):
                 value = values[i].strip()
                 if key in IDS:
-                    value = value + agency_id
+                    value = value + agency_name
                 # handle special cases for setting relationships
                 if name == "StopTime" and key == "trip_id":
                     set_trip_for_stop_time(obj, value)
@@ -122,65 +122,65 @@ def load_agency(gtfs_path):
         #print "Error in loading agency.txt"
         #db.session.rollback()
         
-def load_stops(gtfs_path, agency_id):
+def load_stops(gtfs_path, agency_name):
     print "loading stops"
     try:
-        stops = load_objects(gtfs_path + "stops.txt", "Stop", agency_id)
+        stops = load_objects(gtfs_path + "stops.txt", "Stop", agency_name)
         commit_objects(stops)
     except:
         print "Error in loading stops.txt"
         db.session.rollback()
         
-def load_routes(gtfs_path, agency_id):
+def load_routes(gtfs_path, agency_name):
     print "loading routes"
     try:
-        routes = load_objects(gtfs_path + "routes.txt", "Route", agency_id)
+        routes = load_objects(gtfs_path + "routes.txt", "Route", agency_name)
         commit_objects(routes)
     except:
         print "Error in loading routes.txt"
         db.session.rollback()
         
-def load_trips(gtfs_path, agency_id):
+def load_trips(gtfs_path, agency_name):
     print "loading trips"
     try:
-        trips = load_objects(gtfs_path + "trips.txt", "Trip", agency_id)
+        trips = load_objects(gtfs_path + "trips.txt", "Trip", agency_name)
         commit_objects(trips)
     except:
         print "Error in loading trips.txt"
         db.session.rollback()
         
-def load_stop_times(gtfs_path, agency_id):
+def load_stop_times(gtfs_path, agency_name):
     print "loading stop_times"
     try:
-        stop_times = load_objects(gtfs_path + "stop_times.txt", "StopTime", agency_id)
+        stop_times = load_objects(gtfs_path + "stop_times.txt", "StopTime", agency_name)
         commit_objects(stop_times)
         print "loaded stop_times"
     except:
         print "Error in loading stop_times.txt"
         db.session.rollback()
         
-def load_calendar(gtfs_path, agency_id):
+def load_calendar(gtfs_path, agency_name):
     print "loading calendar"
     try:
-        calendar = load_objects(gtfs_path + "calendar.txt", "Calendar", agency_id)
+        calendar = load_objects(gtfs_path + "calendar.txt", "Calendar", agency_name)
         commit_objects(calendar)
     except:
         print "Error in loading calendar.txt"
         db.session.rollback()
         
-def load_calendar_dates(gtfs_path, agency_id):
+def load_calendar_dates(gtfs_path, agency_name):
     print "loading calendar dates"
     try:
-        calendar_dates = load_objects(gtfs_path + "calendar_dates.txt", "CalendarDate", agency_id)
+        calendar_dates = load_objects(gtfs_path + "calendar_dates.txt", "CalendarDate", agency_name)
         commit_objects(calendar_dates)
     except:
         print "Error in loading calendar_dates.txt"
         db.session.rollback()
         
-def load_shapes(gtfs_path, agency_id):
+def load_shapes(gtfs_path, agency_name):
     print "loading shapes"
     try:
-        shapes = load_objects(gtfs_path + "shapes.txt", "Shape", agency_id)
+        shapes = load_objects(gtfs_path + "shapes.txt", "Shape", agency_name)
         commit_objects(shapes)
         print "loaded shapes"
     except:
@@ -192,14 +192,14 @@ def load_all(gtfs_path):
     # agencies must be loaded before routes (before everything else actually)
     agency = load_agency(gtfs_path)
     # routes must be loaded before trips and before shapes
-    load_routes(gtfs_path, agency.agency_id)
+    load_routes(gtfs_path, agency.agency_name)
     # trips must be loaded before stop_times
-    load_trips(gtfs_path, agency.agency_id)
+    load_trips(gtfs_path, agency.agency_name)
     # stops must be loaded before stop_times 
-    load_stops(gtfs_path, agency.agency_id)
-    load_calendar(gtfs_path, agency.agency_id)
-    load_calendar_dates(gtfs_path, agency.agency_id)
-    thread.start_new_thread(load_shapes, (gtfs_path, agency.agency_id, ))
-    thread.start_new_thread(load_stop_times, (gtfs_path, agency.agency_id, ))
+    load_stops(gtfs_path, agency.agency_name)
+    load_calendar(gtfs_path, agency.agency_name)
+    load_calendar_dates(gtfs_path, agency.agency_name)
+    thread.start_new_thread(load_shapes, (gtfs_path, agency.agency_name, ))
+    thread.start_new_thread(load_stop_times, (gtfs_path, agency.agency_name, ))
 
 
