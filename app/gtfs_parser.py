@@ -27,17 +27,12 @@ def object_for_name(name):
         return models.Shape()
     else:
         return None
-        
-AGENCY_ID = ""
-        
-def load_objects(file, name, agency_id = None):
+                
+def load_objects(file, name, agency_id = ""):
     objects = []
     f = open(file, 'r')
     clean_first_line = f.readline().strip().replace(' ', '')
     keys = clean_first_line.split(',')
-    global AGENCY_ID
-    if not agency_id is None:
-        AGENCY_ID = agency_id
     try:
         for line in f:
             obj = object_for_name(name)
@@ -46,11 +41,8 @@ def load_objects(file, name, agency_id = None):
                 continue
             for i, key in enumerate(keys):
                 value = values[i].strip()
-                if name == "Agency" and key == "agency_name":
-                    AGENCY_ID = " " + value
-                    print "setting new agency_id:" + value
                 if key in IDS:
-                    value = value + AGENCY_ID
+                    value = value + agency_id
                 # handle special cases for setting relationships
                 if name == "StopTime" and key == "trip_id":
                     set_trip_for_stop_time(obj, value)
@@ -125,69 +117,70 @@ def load_agency(gtfs_path):
     #try:
     agencies = load_objects(gtfs_path + "agency.txt", "Agency")
     commit_objects(agencies)
+    return agencies[0]
     #except:
         #print "Error in loading agency.txt"
         #db.session.rollback()
         
-def load_stops(gtfs_path):
+def load_stops(gtfs_path, agency_id):
     print "loading stops"
     try:
-        stops = load_objects(gtfs_path + "stops.txt", "Stop")
+        stops = load_objects(gtfs_path + "stops.txt", "Stop", agency_id)
         commit_objects(stops)
     except:
         print "Error in loading stops.txt"
         db.session.rollback()
         
-def load_routes(gtfs_path):
+def load_routes(gtfs_path, agency_id):
     print "loading routes"
     try:
-        routes = load_objects(gtfs_path + "routes.txt", "Route")
+        routes = load_objects(gtfs_path + "routes.txt", "Route", agency_id)
         commit_objects(routes)
     except:
         print "Error in loading routes.txt"
         db.session.rollback()
         
-def load_trips(gtfs_path):
+def load_trips(gtfs_path, agency_id):
     print "loading trips"
     try:
-        trips = load_objects(gtfs_path + "trips.txt", "Trip")
+        trips = load_objects(gtfs_path + "trips.txt", "Trip", agency_id)
         commit_objects(trips)
     except:
         print "Error in loading trips.txt"
         db.session.rollback()
         
-def load_stop_times(gtfs_path):
+def load_stop_times(gtfs_path, agency_id):
     print "loading stop_times"
     try:
-        stop_times = load_objects(gtfs_path + "stop_times.txt", "StopTime", AGENCY_ID)
+        stop_times = load_objects(gtfs_path + "stop_times.txt", "StopTime", agency_id)
         commit_objects(stop_times)
         print "loaded stop_times"
     except:
         print "Error in loading stop_times.txt"
         db.session.rollback()
         
-def load_calendar(gtfs_path):
+def load_calendar(gtfs_path, agency_id):
     print "loading calendar"
     try:
-        calendar = load_objects(gtfs_path + "calendar.txt", "Calendar")
+        calendar = load_objects(gtfs_path + "calendar.txt", "Calendar", agency_id)
         commit_objects(calendar)
     except:
         print "Error in loading calendar.txt"
         db.session.rollback()
         
-def load_calendar_dates(gtfs_path):
+def load_calendar_dates(gtfs_path, agency_id):
     print "loading calendar dates"
     try:
-        calendar_dates = load_objects(gtfs_path + "calendar_dates.txt", "CalendarDate")
+        calendar_dates = load_objects(gtfs_path + "calendar_dates.txt", "CalendarDate", agency_id)
         commit_objects(calendar_dates)
     except:
         print "Error in loading calendar_dates.txt"
         db.session.rollback()
         
-def load_shapes(gtfs_path):
+def load_shapes(gtfs_path, agency_id):
     print "loading shapes"
     try:
-        shapes = load_objects(gtfs_path + "shapes.txt", "Shape", AGENCY_ID)
+        shapes = load_objects(gtfs_path + "shapes.txt", "Shape", agency_id)
         commit_objects(shapes)
         print "loaded shapes"
     except:
@@ -197,16 +190,16 @@ def load_shapes(gtfs_path):
 def load_all(gtfs_path):
     # the order is important (necessary for relationships):
     # agencies must be loaded before routes (before everything else actually)
-    load_agency(gtfs_path)
+    agency = load_agency(gtfs_path)
     # routes must be loaded before trips and before shapes
-    load_routes(gtfs_path)
+    load_routes(gtfs_path, agency.agency_id)
     # trips must be loaded before stop_times
-    load_trips(gtfs_path)
+    load_trips(gtfs_path, agency.agency_id)
     # stops must be loaded before stop_times 
-    load_stops(gtfs_path)
-    load_calendar(gtfs_path)
-    load_calendar_dates(gtfs_path)
-    thread.start_new_thread(load_shapes, (gtfs_path, ))
-    thread.start_new_thread(load_stop_times, (gtfs_path, ))
+    load_stops(gtfs_path, agency.agency_id)
+    load_calendar(gtfs_path, agency.agency_id)
+    load_calendar_dates(gtfs_path, agency.agency_id)
+    thread.start_new_thread(load_shapes, (gtfs_path, agency.agency_id, ))
+    thread.start_new_thread(load_stop_times, (gtfs_path, agency.agency_id, ))
 
 
