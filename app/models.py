@@ -5,8 +5,8 @@ from datetime import datetime
 
 class Agency(db.Model):
     id = db.Column(db.Integer, primary_key = True)
-    agency_id = db.Column(db.String(64), unique = True)
-    agency_name = db.Column(db.String(128))
+    agency_id = db.Column(db.String(64))
+    agency_name = db.Column(db.String(128), unique = True)
     agency_url = db.Column(db.String(256))
     agency_timezone = db.Column(db.String(64))
     agency_phone = db.Column(db.String(32))
