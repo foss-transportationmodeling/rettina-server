@@ -206,7 +206,7 @@ def load_all(gtfs_path):
     load_stops(gtfs_path)
     load_calendar(gtfs_path)
     load_calendar_dates(gtfs_path)
-    thread.start_new_thread(load_shapes, (gtfs_path))
-    thread.start_new_thread(load_stop_times, (gtfs_path))
+    thread.start_new_thread(load_shapes, (gtfs_path, ))
+    thread.start_new_thread(load_stop_times, (gtfs_path, ))
 
 
