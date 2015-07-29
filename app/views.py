@@ -263,6 +263,7 @@ def private_method():
         zfile = zipfile.ZipFile(file)
         path = 'tmp/GTFS/' + file.split('.')[0] + '/'
         zfile.extractall(path)
+        zfile.close()
         gtfs_parser.load_all(path)
     
 @app.errorhandler(400)

@@ -111,80 +111,86 @@ def set_route_for_trip(trip, route_id):
 def commit_objects(objects):
     for obj in objects:
         db.session.add(obj)
-    print "\tabout to commit " + str(len(objects)) + " objects"
     db.session.commit()
 
 def load_agency(gtfs_path):
-    print "loading agencies"
-    #try:
-    agencies = load_objects(gtfs_path + "agency.txt", "Agency")
-    commit_objects(agencies)
-    return agencies[0]
-    #except:
-        #print "Error in loading agency.txt"
-        #db.session.rollback()
+    try:
+        agencies = load_objects(gtfs_path + "agency.txt", "Agency")
+        commit_objects(agencies)
+        if len(agencies) > 0:
+            print "loaded agency:\t" + agencies[0].agency_name
+            return agencies[0]
+        else:
+            print "agency.txt contained no agencies!"
+            return None
+    except:
+        print "Error in loading agency.txt"
+        db.session.rollback()
+        return None
         
 def load_stops(gtfs_path, agency_name):
-    print "loading stops"
     try:
         stops = load_objects(gtfs_path + "stops.txt", "Stop", agency_name)
         commit_objects(stops)
+        print "loaded stops:\t" + agency_name
     except:
         print "Error in loading stops.txt"
         db.session.rollback()
         
 def load_routes(gtfs_path, agency_name):
-    print "loading routes"
     try:
         routes = load_objects(gtfs_path + "routes.txt", "Route", agency_name)
         commit_objects(routes)
+        print "loaded routes:\t" + agency_name
     except:
         print "Error in loading routes.txt"
         db.session.rollback()
         
 def load_trips(gtfs_path, agency_name):
-    print "loading trips"
     try:
         trips = load_objects(gtfs_path + "trips.txt", "Trip", agency_name)
         commit_objects(trips)
+        print "loaded trips:\t" + agency_name        
     except:
         print "Error in loading trips.txt"
         db.session.rollback()
         
 def load_stop_times(gtfs_path, agency_name):
-    print "loading stop_times"
+    print "loading stop_times:\t" + agency_name
     try:
         stop_times = load_objects(gtfs_path + "stop_times.txt", "StopTime", agency_name)
+        for st in stop_times:
+            db.session.add(st)
         commit_objects(stop_times)
-        print "loaded stop_times"
+        print "loaded stop_times:\t" + agency_name
     except:
         print "Error in loading stop_times.txt"
         db.session.rollback()
         
 def load_calendar(gtfs_path, agency_name):
-    print "loading calendar"
     try:
         calendar = load_objects(gtfs_path + "calendar.txt", "Calendar", agency_name)
         commit_objects(calendar)
+        print "loaded calendar:\t" + agency_name
     except:
         print "Error in loading calendar.txt"
         db.session.rollback()
         
 def load_calendar_dates(gtfs_path, agency_name):
-    print "loading calendar dates"
     try:
         calendar_dates = load_objects(gtfs_path + "calendar_dates.txt", "CalendarDate", agency_name)
         commit_objects(calendar_dates)
+        print "loaded calendar_dates:\t" + agency_name
     except:
         print "Error in loading calendar_dates.txt"
         db.session.rollback()
         
 def load_shapes(gtfs_path, agency_name):
-    print "loading shapes"
+    print "loading shapes:\t" + agency_name
     try:
         shapes = load_objects(gtfs_path + "shapes.txt", "Shape", agency_name)
         commit_objects(shapes)
-        print "loaded shapes"
+        print "loaded shapes:\t" + agency_name
     except:
         print "Error in loading shapes.txt"
         db.session.rollback()
