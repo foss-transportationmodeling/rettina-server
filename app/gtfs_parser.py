@@ -32,6 +32,8 @@ def load_objects(file, name, agency_name = ""):
     try:
         with open(file, 'r') as f:
             print "Loading " + name + ":\t" + agency_name
+            batch_num = 1
+            objects_added = 0
             clean_first_line = f.readline().strip().replace(' ', '')
             keys = clean_first_line.split(',')
             for line in f:
@@ -61,11 +63,20 @@ def load_objects(file, name, agency_name = ""):
                     elif hasattr(obj, key):
                         setattr(obj, key, value)
                 db.session.add(obj)
+                objects_added = objects_added + 1
+                if objects_added >= 1500:
+                    db.session.commit()
+                    objects_added = 0
+                    print "Loaded batch " + str(batch_num)
+                    batch_num = batch_num + 1
             f.close()
             db.session.commit()
-            print "Loaded " + name + ":\t" + agency_name
-    except IndexError:
-        print "A value is missing from " + file
+            if batch_num == 1:  
+                print "Loaded " + name + ":\t" + agency_name
+            else:
+                print "Loaded " + name + ":\t" + agency_name + "\t(finished: batch " + str(batch_num) + ")"
+    except IndexError e:
+        print "A value is missing from " + file + ":\t" e.description
         db.session.rollback()
     except e:
         print "Error in loading " + file + ":\t" + e.description
