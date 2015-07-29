@@ -207,7 +207,9 @@ def load_all(gtfs_path):
     load_stops(gtfs_path, agency.agency_name)
     load_calendar(gtfs_path, agency.agency_name)
     load_calendar_dates(gtfs_path, agency.agency_name)
-    thread.start_new_thread(load_shapes, (gtfs_path, agency.agency_name, ))
-    thread.start_new_thread(load_stop_times, (gtfs_path, agency.agency_name, ))
+    load_shapes(gtfs_path, agency.agency_name)
+    load_stop_times(gtfs_path, agency.agency_name)
+    #thread.start_new_thread(load_shapes, (gtfs_path, agency.agency_name, ))
+    #thread.start_new_thread(load_stop_times, (gtfs_path, agency.agency_name, ))
 
 
