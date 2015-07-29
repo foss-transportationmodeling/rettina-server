@@ -60,6 +60,7 @@ def load_objects(file, name, agency_name = ""):
                         if hasattr(obj, key):
                             setattr(obj, key, value)
                 objects.append(obj)
+            f.close()
     except IndexError:
         print "A value is missing from " + file
     return objects
