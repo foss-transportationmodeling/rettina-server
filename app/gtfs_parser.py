@@ -30,36 +30,36 @@ def object_for_name(name):
                 
 def load_objects(file, name, agency_name = ""):
     objects = []
-    f = open(file, 'r')
-    clean_first_line = f.readline().strip().replace(' ', '')
-    keys = clean_first_line.split(',')
     try:
-        for line in f:
-            obj = object_for_name(name)
-            values = line.strip().split(',')
-            if len(values) == 0:
-                continue
-            for i, key in enumerate(keys):
-                value = values[i].strip()
-                if key in IDS:
-                    value = value + agency_name
-                # handle special cases for setting relationships
-                if name == "StopTime" and key == "trip_id":
-                    set_trip_for_stop_time(obj, value)
-                elif name == "StopTime" and key == "arrival_time":
-                    obj.arrival_time = datetime_from_string(value)
-                elif name == "StopTime" and key == "departure_time":
-                    obj.departure_time = datetime_from_string(value)
-                elif name == "StopTime" and key == "stop_id":
-                    set_stop_for_stop_time(obj, value)
-                elif name == "Route" and key == "agency_id":
-                    set_agency_for_route(obj, value)
-                elif name == "Trip" and key == "route_id":
-                    set_route_for_trip(obj, value)
-                else:
-                    if hasattr(obj, key):
-                        setattr(obj, key, value)
-            objects.append(obj)
+        with open(file, 'r') as f:
+            clean_first_line = f.readline().strip().replace(' ', '')
+            keys = clean_first_line.split(',')
+            for line in f:
+                obj = object_for_name(name)
+                values = line.strip().split(',')
+                if len(values) == 0:
+                    continue
+                for i, key in enumerate(keys):
+                    value = values[i].strip()
+                    if key in IDS:
+                        value = value + " " + agency_name
+                    # handle special cases for setting relationships
+                    if name == "StopTime" and key == "trip_id":
+                        set_trip_for_stop_time(obj, value)
+                    elif name == "StopTime" and key == "arrival_time":
+                        obj.arrival_time = datetime_from_string(value)
+                    elif name == "StopTime" and key == "departure_time":
+                        obj.departure_time = datetime_from_string(value)
+                    elif name == "StopTime" and key == "stop_id":
+                        set_stop_for_stop_time(obj, value)
+                    elif name == "Route" and key == "agency_id":
+                        set_agency_for_route(obj, value)
+                    elif name == "Trip" and key == "route_id":
+                        set_route_for_trip(obj, value)
+                    else:
+                        if hasattr(obj, key):
+                            setattr(obj, key, value)
+                objects.append(obj)
     except IndexError:
         print "A value is missing from " + file
     return objects
