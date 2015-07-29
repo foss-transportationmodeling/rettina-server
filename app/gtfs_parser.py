@@ -29,9 +29,9 @@ def object_for_name(name):
         return None
                 
 def load_objects(file, name, agency_name = ""):
-    objects = []
     try:
         with open(file, 'r') as f:
+            print "Loading " + name + ":\t" + agency_name
             clean_first_line = f.readline().strip().replace(' ', '')
             keys = clean_first_line.split(',')
             for line in f:
@@ -44,7 +44,9 @@ def load_objects(file, name, agency_name = ""):
                     if key in IDS:
                         value = value + " " + agency_name
                     # handle special cases for setting relationships
-                    if name == "StopTime" and key == "trip_id":
+                    if name == "Agency" and key == "agency_name":
+                        agency_name = value
+                    elif name == "StopTime" and key == "trip_id":
                         set_trip_for_stop_time(obj, value)
                     elif name == "StopTime" and key == "arrival_time":
                         obj.arrival_time = datetime_from_string(value)
@@ -56,14 +58,19 @@ def load_objects(file, name, agency_name = ""):
                         set_agency_for_route(obj, value)
                     elif name == "Trip" and key == "route_id":
                         set_route_for_trip(obj, value)
-                    else:
-                        if hasattr(obj, key):
-                            setattr(obj, key, value)
-                objects.append(obj)
+                    elif hasattr(obj, key):
+                        setattr(obj, key, value)
+                db.session.add(obj)
             f.close()
+            db.session.commit()
+            print "Loaded " + name + ":\t" + agency_name
     except IndexError:
         print "A value is missing from " + file
-    return objects
+        db.session.rollback()
+    except e:
+        print "Error in loading " + file + ":\t" + e.description
+        db.session.rollback()
+    return agency_name
     
 def datetime_from_string(string):
     hr = int(string.split(":")[0])
@@ -108,107 +115,20 @@ def set_route_for_trip(trip, route_id):
     if not route is None:
         trip.route = route
 
-def commit_objects(objects):
-    for obj in objects:
-        db.session.add(obj)
-    db.session.commit()
-
-def load_agency(gtfs_path):
-    try:
-        agencies = load_objects(gtfs_path + "agency.txt", "Agency")
-        commit_objects(agencies)
-        if len(agencies) > 0:
-            print "loaded agency:\t" + agencies[0].agency_name
-            return agencies[0]
-        else:
-            print "agency.txt contained no agencies!"
-            return None
-    except:
-        print "Error in loading agency.txt"
-        db.session.rollback()
-        return None
-        
-def load_stops(gtfs_path, agency_name):
-    try:
-        stops = load_objects(gtfs_path + "stops.txt", "Stop", agency_name)
-        commit_objects(stops)
-        print "loaded stops:\t" + agency_name
-    except:
-        print "Error in loading stops.txt"
-        db.session.rollback()
-        
-def load_routes(gtfs_path, agency_name):
-    try:
-        routes = load_objects(gtfs_path + "routes.txt", "Route", agency_name)
-        commit_objects(routes)
-        print "loaded routes:\t" + agency_name
-    except:
-        print "Error in loading routes.txt"
-        db.session.rollback()
-        
-def load_trips(gtfs_path, agency_name):
-    try:
-        trips = load_objects(gtfs_path + "trips.txt", "Trip", agency_name)
-        commit_objects(trips)
-        print "loaded trips:\t" + agency_name        
-    except:
-        print "Error in loading trips.txt"
-        db.session.rollback()
-        
-def load_stop_times(gtfs_path, agency_name):
-    print "loading stop_times:\t" + agency_name
-    try:
-        stop_times = load_objects(gtfs_path + "stop_times.txt", "StopTime", agency_name)
-        for st in stop_times:
-            db.session.add(st)
-        commit_objects(stop_times)
-        print "loaded stop_times:\t" + agency_name
-    except:
-        print "Error in loading stop_times.txt"
-        db.session.rollback()
-        
-def load_calendar(gtfs_path, agency_name):
-    try:
-        calendar = load_objects(gtfs_path + "calendar.txt", "Calendar", agency_name)
-        commit_objects(calendar)
-        print "loaded calendar:\t" + agency_name
-    except:
-        print "Error in loading calendar.txt"
-        db.session.rollback()
-        
-def load_calendar_dates(gtfs_path, agency_name):
-    try:
-        calendar_dates = load_objects(gtfs_path + "calendar_dates.txt", "CalendarDate", agency_name)
-        commit_objects(calendar_dates)
-        print "loaded calendar_dates:\t" + agency_name
-    except:
-        print "Error in loading calendar_dates.txt"
-        db.session.rollback()
-        
-def load_shapes(gtfs_path, agency_name):
-    print "loading shapes:\t" + agency_name
-    try:
-        shapes = load_objects(gtfs_path + "shapes.txt", "Shape", agency_name)
-        commit_objects(shapes)
-        print "loaded shapes:\t" + agency_name
-    except:
-        print "Error in loading shapes.txt"
-        db.session.rollback()
-
 def load_all(gtfs_path):
     # the order is important (necessary for relationships):
     # agencies must be loaded before routes (before everything else actually)
-    agency = load_agency(gtfs_path)
+    agency_name = load_objects(gtfs_path + "agency.txt", "Agency")
     # routes must be loaded before trips and before shapes
-    load_routes(gtfs_path, agency.agency_name)
+    load_objects(gtfs_path + "routes.txt", "Route", agency_name)
     # trips must be loaded before stop_times
-    load_trips(gtfs_path, agency.agency_name)
+    load_objects(gtfs_path + "trips.txt", "Trip", agency_name)
     # stops must be loaded before stop_times 
-    load_stops(gtfs_path, agency.agency_name)
-    load_calendar(gtfs_path, agency.agency_name)
-    load_calendar_dates(gtfs_path, agency.agency_name)
-    load_shapes(gtfs_path, agency.agency_name)
-    load_stop_times(gtfs_path, agency.agency_name)
+    load_objects(gtfs_path + "stops.txt", "Stop", agency_name)
+    load_objects(gtfs_path + "calendar.txt", "Calendar", agency_name)
+    load_objects(gtfs_path + "calendar_dates.txt", "CalendarDate", agency_name)
+    load_objects(gtfs_path + "shapes.txt", "Shape", agency_name)
+    load_objects(gtfs_path + "stop_times.txt", "StopTime", agency_name)
     #thread.start_new_thread(load_shapes, (gtfs_path, agency.agency_name, ))
     #thread.start_new_thread(load_stop_times, (gtfs_path, agency.agency_name, ))
 
