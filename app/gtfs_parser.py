@@ -111,6 +111,7 @@ def set_route_for_trip(trip, route_id):
 def commit_objects(objects):
     for obj in objects:
         db.session.add(obj)
+    print "\tabout to commit " + str(len(objects)) + " objects"
     db.session.commit()
 
 def load_agency(gtfs_path):
