@@ -7,6 +7,7 @@ from calendar import timegm
 import thread
 
 IDS = ["stop_id", "route_id", "service_id", "trip_id", "shape_id"]
+BATCH_SIZE = 2000
 
 def object_for_name(name):
     if name == "Agency":
@@ -38,8 +39,9 @@ def load_objects(file, name, agency_name = ""):
             keys = clean_first_line.split(',')
             for line in f:
                 obj = object_for_name(name)
-                values = line.strip().split(',')
-                if len(values) == 0:
+                stripped = line.strip()
+                values = stripped.split(',')
+                if len(stripped) == 0 or len(values) == 0:
                     continue
                 for i, key in enumerate(keys):
                     value = values[i].strip()
@@ -64,7 +66,7 @@ def load_objects(file, name, agency_name = ""):
                         setattr(obj, key, value)
                 db.session.add(obj)
                 objects_added = objects_added + 1
-                if objects_added >= 1500:
+                if objects_added >= BATCH_SIZE:
                     db.session.commit()
                     objects_added = 0
                     print "Loaded batch " + str(batch_num)
@@ -78,7 +80,7 @@ def load_objects(file, name, agency_name = ""):
     except IndexError, e:
         print "A value is missing from " + file + ":\t" + str(e)
         db.session.rollback()
-    except e:
+    except Exception, e:
         print "Error in loading " + file + ":\t" + str(e)
         db.session.rollback()
     return agency_name
