@@ -76,10 +76,10 @@ def load_objects(file, name, agency_name = ""):
             else:
                 print "Loaded " + name + ":\t" + agency_name + "\t(finished: batch " + str(batch_num) + ")"
     except IndexError, e:
-        print "A value is missing from " + file + ":\t" + e.description
+        print "A value is missing from " + file + ":\t" + str(e)
         db.session.rollback()
     except e:
-        print "Error in loading " + file + ":\t" + e.description
+        print "Error in loading " + file + ":\t" + str(e)
         db.session.rollback()
     return agency_name
     
