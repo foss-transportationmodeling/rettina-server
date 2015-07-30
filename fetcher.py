@@ -1,3 +1,11 @@
+# this file is not used by the application,
+# but it provides a way to retrieve data from the UConn JSON feeds
+
+# I used some of the methods in here (e.g. load_shapes, ShapeItem, km_distance) 
+# to create 'shapes.txt' for UConn, based on the UConn JSON feeds
+# This file's purpose has been served, so it really isn't necessary
+# I left it in though because, well, you never know...
+
 import urllib2, json
 
 UCONN_ROUTE_INFO_URL = 'http://www.uconnshuttle.com/Services/JSONPRelay.svc/GetRoutes'
@@ -154,4 +162,3 @@ def load_shapes():
             order = order + 1
             file.write(shape.to_str() + "\n")
             
-load_shapes()

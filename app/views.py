@@ -7,14 +7,17 @@ from datetime import datetime
 
 import thread
 
+# decodes a URL-encoded string
 def decode(url):
     return urllib.unquote(url).decode('utf8')
 
+# returns all agencies
 @app.route('/agency', methods=['GET'])
 def get_agency():
     agencies = models.Agency.query.all()
     return jsonify({ 'agencies' : [a.serialize() for a in agencies] })
 
+# returns stops, with the option to filter by trip_id
 @app.route('/stops', methods=['GET'])
 def get_stops():
     stops = None
@@ -29,6 +32,7 @@ def get_stops():
             return jsonify({ '404' : 'No Stops Found' })
     return jsonify({ 'stops' : [s.serialize() for s in stops] })
 
+# returns routes, with extensive filtering (see API documentation)
 @app.route('/routes', methods=['GET'])
 def get_routes():
     routes = None
@@ -91,6 +95,8 @@ def get_routes():
         routes = models.Route.query.all()
         
     return jsonify({ 'routes' : [r.serialize(valid_trips, n) for r in routes] })
+# the collection return from a query is not an array itself,
+# so it must be converted to an array to sort stop_times by arrival time
 def array_from_query(q):
     a = []
     for item in q:
@@ -100,11 +106,13 @@ def unique_array(regular_array): # Order preserving
   seen = set()
   return [x for x in regular_array if x not in seen and not seen.add(x)]
   
+# returns all trips
 @app.route('/trips', methods=['GET'])
 def get_trips():
     trips = models.Trip.query.all()
     return jsonify({ 'trips' : [t.serialize() for t in trips] })
     
+# returns all experiences, with optional filtering by route_id or trip_id
 @app.route('/experiences', methods=['GET'])
 def get_experiences():
     experiences = None
@@ -126,6 +134,7 @@ def get_experiences():
         experiences = models.Experience.query.filter(models.Experience.route == route)
     return jsonify({ 'experiences' : [e.serialize() for e in experiences] })
     
+# creates a new experience... all data is taken from URL parameters, not from JSON
 @app.route('/experiences', methods=['POST'])
 def create_experience():
     trip_id = decode(request.args.get('trip_id', ''))
@@ -145,6 +154,7 @@ def create_experience():
     db.session.commit()
     return jsonify(experience.serialize()), 200
     
+# returns all locations, with optional filtering by group_id, trip_id, or route_id
 @app.route('/locations', methods=['GET'])
 def get_locations():
     locations = None
@@ -169,6 +179,7 @@ def get_locations():
         locations = models.Location.query.filter(models.Location.route == route)
     return jsonify({ 'locations' : [l.serialize() for l in locations] })
     
+# creates new locations by receiving JSON... locations in 1 JSON post will all share the same grouping_id
 @app.route('/locations', methods=['POST'])
 def create_locations():
     locations = []
@@ -212,6 +223,9 @@ def create_locations():
     db.session.commit()
     return jsonify({ 'locations' : [l.serialize() for l in locations] }), 200
     
+# returns all stop_times, with optional filtering by trip_id
+# Filtering by trip_id is HIGHLY encouraged when working with large datasets,
+# as the request may timeout before the server can retrieve and render all stop_times.
 @app.route('/stop_times', methods=['GET'])
 def get_stop_times():
     stop_times = None
@@ -225,16 +239,19 @@ def get_stop_times():
         stop_times = models.StopTime.query.all()
     return jsonify({ 'stop_times' : [st.serialize() for st in stop_times] })
 
+# returns all calendars
 @app.route('/calendar', methods=['GET'])
 def get_calendar():
     calendar = models.Calendar.query.all()
     return jsonify({ 'calendar' : [c.serialize() for c in calendar] })
     
+# returns all calendar_dates
 @app.route('/calendar_dates', methods=['GET'])
 def get_calendar_dates():
     cal_dates = models.CalendarDate.query.all()
     return jsonify({ 'calendar_dates' : [cd.serialize() for cd in cal_dates] })
     
+# returns all shapes, with optional filtering by trip_id
 @app.route('/shapes', methods=['GET'])
 def get_shapes():
     shapes = None
@@ -245,6 +262,7 @@ def get_shapes():
         trip = models.Trip.query.filter(models.Trip.trip_id == trip_id).first()
         if not trip is None:
             if 'UConn' in trip.trip_id:
+                # handle special case for UConn data: the shape_id corresponds to a route_id
                 s_id = trip.route.route_id
                 shapes = models.Shape.query.filter(models.Shape.shape_id == s_id)
             else:
@@ -253,18 +271,25 @@ def get_shapes():
             return jsonify({ '404' : 'Invalid Trip ID' })
     return jsonify({ 'shapes' : [s.serialize() for s in shapes] })    
 
+# very important method here: loads all GTFS data into the database
+# if deploying into production, this method should be made private (remove @app.route)
+# *** NOTE *** before calling this method, the database should be wiped and/or emptied of records,
+# otherwise there will be conflicts with duplicate entries
 @app.route('/load_gtfs', methods=['GET'])
 def load_gtfs():
+    # starting a new thread enables the loading process to happen in the background,
+    # otherwise the request would timeout before all data could be loaded
     thread.start_new_thread(private_method, ())
     return jsonify({ '200' : 'Data Loading' })
 def private_method():
-    shutil.rmtree('tmp/GTFS')
-    for file in glob.glob('*.zip'):
+    shutil.rmtree('tmp/GTFS') # previous GTFS data is removed from the tmp directory
+    for file in glob.glob('*.zip'): # find each zip file
         zfile = zipfile.ZipFile(file)
-        path = 'tmp/GTFS/' + file.split('.')[0] + '/'
+        path = 'tmp/GTFS/' + file.split('.')[0] + '/' # the contents will be extracted into here
+        # e.g. 'tmp/GTFS/Hartford/' or '/tmp/GTFS/UConn/'
         zfile.extractall(path)
         zfile.close()
-        gtfs_parser.load_all(path)
+        gtfs_parser.load_all(path) # this is where the heavy lifting comes in
     
 @app.errorhandler(400)
 def bad_request(error):

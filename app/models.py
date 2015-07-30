@@ -1,7 +1,8 @@
 from app import db
 from datetime import datetime
 
-# add fields such as required, default value, positive integer
+# this file is pretty self-explanatory
+# the serialize() method for each class is used when rendering JSON
 
 class Agency(db.Model):
     id = db.Column(db.Integer, primary_key = True)

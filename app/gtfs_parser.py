@@ -4,11 +4,16 @@ from datetime import datetime
 from pytz import utc
 from calendar import timegm
 
-import thread
-
+# these IDs will have agency_name appended to them, to make them unique
+# (in case multiple datasets have routes with the same route_id, for example)
 IDS = ["stop_id", "route_id", "service_id", "trip_id", "shape_id"]
+
+# large datasets must be loaded in batches, otherwise the process will take
+# too much memory and the system will kill it
+# I'd say the max batch size you could get away with is about 15,000
 BATCH_SIZE = 2000
 
+# pass in a name, and it will return a new object corresponding to that name
 def object_for_name(name):
     if name == "Agency":
         return models.Agency()
@@ -42,6 +47,7 @@ def load_objects(file, name, agency_name = ""):
                 stripped = line.strip()
                 values = stripped.split(',')
                 if len(stripped) == 0 or len(values) == 0:
+                    # no usable information on this line
                     continue
                 for i, key in enumerate(keys):
                     value = values[i].strip()
@@ -73,7 +79,7 @@ def load_objects(file, name, agency_name = ""):
                     batch_num = batch_num + 1
             f.close()
             db.session.commit()
-            if batch_num == 1:  
+            if batch_num == 1:
                 print "Loaded " + name + ":\t" + agency_name
             else:
                 print "Loaded " + name + ":\t" + agency_name + "\t(finished: batch " + str(batch_num) + ")"
@@ -85,18 +91,22 @@ def load_objects(file, name, agency_name = ""):
         db.session.rollback()
     return agency_name
     
+# takes a GTFS-formatted string and returns the datetime 
 def datetime_from_string(string):
     hr = int(string.split(":")[0])
     if hr >= 24:
+        # some GTFS strings go over 24 hours for some reason,
+        # so we have to modify these strings so that strptime() will work
         l = list(string)
         l[0] = "0"
         l[1] = str(hr % 24)
         string = "".join(l)
     def to_datetime_from_utc(time_tuple):
         timestamp = timegm(time_tuple)
-        if hr >= 24:
+        if hr >= 24: # if we had to modify the string because it went over 24 hr, add a day
             timestamp  = timestamp + 24*60*60
-        return datetime.fromtimestamp(timegm(time_tuple), tz = utc)    
+        return datetime.fromtimestamp(timegm(time_tuple), tz = utc)   
+    # reference: https://docs.python.org/2/library/datetime.html#strftime-strptime-behavior
     return to_datetime_from_utc(strptime(string, "%H:%M:%S"))
 
 # this will always happen before setting the Stop ID for a stop_time
@@ -140,9 +150,8 @@ def load_all(gtfs_path):
     load_objects(gtfs_path + "stops.txt", "Stop", agency_name)
     load_objects(gtfs_path + "calendar.txt", "Calendar", agency_name)
     load_objects(gtfs_path + "calendar_dates.txt", "CalendarDate", agency_name)
+    # save the slowest for last... these two files tend to take the longest to load
     load_objects(gtfs_path + "shapes.txt", "Shape", agency_name)
     load_objects(gtfs_path + "stop_times.txt", "StopTime", agency_name)
-    #thread.start_new_thread(load_shapes, (gtfs_path, agency.agency_name, ))
-    #thread.start_new_thread(load_stop_times, (gtfs_path, agency.agency_name, ))
 
 
