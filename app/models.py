@@ -123,7 +123,7 @@ class Trip(db.Model):
     wheelchair_accessible = db.Column(db.Integer)
     bikes_allowed = db.Column(db.Integer)
     stops = db.relationship('Stop', secondary = stops, 
-        backref = db.backref('trips', lazy = 'dynamic', cascade = "all, delete-orphan"))
+        backref = db.backref('trips', lazy = 'dynamic'))
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
     route = db.relationship('Route', backref = db.backref('trips', lazy = 'dynamic', cascade = "all, delete-orphan"))
     def serialize(self):
