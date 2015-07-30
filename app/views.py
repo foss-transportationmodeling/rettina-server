@@ -282,6 +282,7 @@ def load_gtfs():
     thread.start_new_thread(private_method, ())
     return jsonify({ '200' : 'Data Loading' })
 def private_method():
+    delete_all_records()
     shutil.rmtree('tmp/GTFS') # previous GTFS data is removed from the tmp directory
     for file in glob.glob('*.zip'): # find each zip file
         zfile = zipfile.ZipFile(file)
@@ -290,6 +291,18 @@ def private_method():
         zfile.extractall(path)
         zfile.close()
         gtfs_parser.load_all(path) # this is where the heavy lifting comes in
+def delete_all_records():
+    # the records should be deleted in the OPPOSITE order they are loaded in
+    models.StopTime.query.delete()
+    models.Shape.query.delete()
+    models.Experience.query.delete()
+    models.Location.query.delete()
+    models.CalendarDate.query.delete()
+    models.Calendar.query.delete()
+    models.Stop.query.delete()
+    models.Trip.query.delete()
+    models.Route.query.delete()
+    models.Agency.query.delete()
     
 @app.errorhandler(400)
 def bad_request(error):
