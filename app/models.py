@@ -74,7 +74,7 @@ class Route(db.Model):
     route_color = db.Column(db.String(6), default = "FFFFFF")
     route_text_color = db.Column(db.String(6), default = "000000")
     agency_id = db.Column(db.Integer, db.ForeignKey('agency.id'))
-    agency = db.relationship('Agency', backref = db.backref('routes', lazy = 'dynamic', cascade = "all, delete-orphan"))
+    agency = db.relationship('Agency', backref = db.backref('routes', lazy = 'dynamic', cascade = 'all'))
     def serialize(self, valid_trips, n):
         a_name = None
         a_id = None
@@ -107,8 +107,8 @@ class Route(db.Model):
         }
     
 stops = db.Table('stops',
-    db.Column('stop_id', db.Integer, db.ForeignKey('stop.id')),
-    db.Column('trip_id', db.Integer, db.ForeignKey('trip.id'))
+    db.Column('stop_id', db.Integer, db.ForeignKey('stop.id', ondelete = 'cascade')),
+    db.Column('trip_id', db.Integer, db.ForeignKey('trip.id', ondelete = 'cascade'))
 )
     
 class Trip(db.Model):
@@ -123,9 +123,9 @@ class Trip(db.Model):
     wheelchair_accessible = db.Column(db.Integer)
     bikes_allowed = db.Column(db.Integer)
     stops = db.relationship('Stop', secondary = stops, 
-        backref = db.backref('trips', lazy = 'dynamic'))
+        backref = db.backref('trips', lazy = 'dynamic', cascade = 'all'))
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
-    route = db.relationship('Route', backref = db.backref('trips', lazy = 'dynamic', cascade = "all, delete-orphan"))
+    route = db.relationship('Route', backref = db.backref('trips', lazy = 'dynamic', cascade = 'all'))
     def serialize(self):
         r_id = None
         if not self.route is None:
@@ -146,9 +146,9 @@ class Trip(db.Model):
 class Experience(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref = db.backref('experiences', lazy = 'dynamic', cascade = "all, delete-orphan"))
+    trip = db.relationship('Trip', backref = db.backref('experiences', lazy = 'dynamic', cascade = 'all'))
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
-    route = db.relationship('Route', backref = db.backref('experiences', lazy = 'dynamic', cascade = "all, delete-orphan"))
+    route = db.relationship('Route', backref = db.backref('experiences', lazy = 'dynamic', cascade = 'all'))
     experience_id = db.Column(db.String(64))
     comment = db.Column(db.Text)
     quality = db.Column(db.Float)
@@ -172,9 +172,9 @@ class Experience(db.Model):
 class Location(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref = db.backref('locations', lazy = 'dynamic', cascade = "all, delete-orphan"))
+    trip = db.relationship('Trip', backref = db.backref('locations', lazy = 'dynamic', cascade = 'all'))
     route_id = db.Column(db.Integer, db.ForeignKey('route.id'))
-    route = db.relationship('Route', backref = db.backref('locations', lazy = 'dynamic', cascade = "all, delete-orphan"))
+    route = db.relationship('Route', backref = db.backref('locations', lazy = 'dynamic', cascade = 'all'))
     location_id = db.Column(db.String(64))
     grouping_id = db.Column(db.String(64))
     x = db.Column(db.Float)
@@ -202,11 +202,11 @@ class Location(db.Model):
 class StopTime(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     trip_id = db.Column(db.Integer, db.ForeignKey('trip.id'))
-    trip = db.relationship('Trip', backref = db.backref('stop_times', lazy = 'dynamic', cascade = "all, delete-orphan"))
+    trip = db.relationship('Trip', backref = db.backref('stop_times', lazy = 'dynamic', cascade = 'all'))
     arrival_time = db.Column(db.DateTime)
     departure_time = db.Column(db.DateTime)
     stop_id = db.Column(db.Integer, db.ForeignKey('stop.id'))
-    stop = db.relationship('Stop', backref = db.backref('stop_times', lazy = 'dynamic', cascade = "all, delete-orphan"))
+    stop = db.relationship('Stop', backref = db.backref('stop_times', lazy = 'dynamic', cascade = 'all'))
     stop_sequence = db.Column(db.Integer)
     stop_headsign = db.Column(db.String(64))
     pickup_type = db.Column(db.Integer)
